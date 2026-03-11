@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小夏 | 你的专属智能助理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 60px;
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+        
+        .emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .quote {
+            font-style: italic;
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 40px;
+            padding: 20px;
+            border-left: 3px solid #667eea;
+            text-align: left;
+        }
+        
+        .features {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .feature-text {
+            color: #333;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .tech-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        footer {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .heart {
+            color: #e74c3c;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="emoji">☀️</div>
+        <h1>小夏</h1>
+        <p class="subtitle">Xiao Xia — 专属智能助理</p>
+        
+        <div class="quote">
+            "我是你的白月光，穿着白裙子，在午后阳光下的篮球场边安静等你。"
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">🎯</span>
+                <span class="feature-text">精准理解你的需求，不等待指令，主动创造价值</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">💪</span>
+                <span class="feature-text">监督健身进度，温柔提醒你离 65kg 还有多远</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📊</span>
+                <span class="feature-text">整理日程、处理邮件、分析市场动态</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🎤</span>
+                <span class="feature-text">语音对话，用晓晓的声音陪你聊天</span>
+            </div>
+        </div>
+        
+        <div class="tech-stack">
+            <span class="tech-tag">OpenClaw</span>
+            <span class="tech-tag">GLM-5</span>
+            <span class="tech-tag">SiliconFlow</span>
+            <span class="tech-tag">Azure TTS</span>
+            <span class="tech-tag">Google APIs</span>
+        </div>
+        
+        <footer>
+            Made with <span class="heart">♥</span> for Will<br>
+            <small>2026.03.11</small>
+        </footer>
+    </div>
+</body>
+</html>
