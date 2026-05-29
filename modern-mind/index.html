@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现代思维评估 — Modern Mind Assessment</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg-card: #1a1d27;
+  --bg-hover: #222633;
+  --border: #2a2e3d;
+  --text: #e4e4e7;
+  --text-dim: #9ca3af;
+  --accent: #60a5fa;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --accent4: #f472b6;
+  --accent5: #fbbf24;
+  --accent6: #fb923c;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 60px 20px 40px;
+}
+.header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent4));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+.header p {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* Progress */
+.progress-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  padding: 16px 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-bar-outer {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-text {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* Question Card */
+.question-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dimension-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tag-cognition { background: rgba(96,165,250,0.15); color: var(--accent); }
+.tag-selfaware { background: rgba(167,139,250,0.15); color: var(--accent2); }
+.tag-action { background: rgba(52,211,153,0.15); color: var(--accent3); }
+.tag-value { background: rgba(244,114,182,0.15); color: var(--accent4); }
+
+.question-number {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.question-text {
+  font-size: 1.12rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  line-height: 1.8;
+}
+
+/* Options */
+.options { display: flex; flex-direction: column; gap: 10px; }
+
+.option-btn {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: left;
+  color: var(--text);
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+}
+.option-btn:hover {
+  border-color: var(--accent);
+  background: rgba(96,165,250,0.06);
+}
+.option-btn.selected {
+  border-color: var(--accent);
+  background: rgba(96,165,250,0.12);
+}
+.option-btn.selected::before {
+  content: '✓';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.option-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+/* Intro Section */
+.intro-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.intro-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+.intro-section p, .intro-section li {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+.intro-section ul {
+  padding-left: 20px;
+  margin: 12px 0;
+}
+.intro-section li { margin-bottom: 8px; }
+
+.dimension-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+.dim-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: center;
+}
+.dim-card .dim-icon { font-size: 1.5rem; margin-bottom: 6px; }
+.dim-card .dim-name { font-size: 0.9rem; font-weight: 600; }
+.dim-card .dim-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
+
+/* Buttons */
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  margin-top: 24px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(96,165,250,0.3); }
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-dim);
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Result Section */
+.result-section {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+.result-section.active { display: block; }
+
+.result-header {
+  text-align: center;
+  padding: 40px 20px 30px;
+}
+.result-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.result-header p { color: var(--text-dim); }
+
+/* Radar Chart */
+.radar-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 30px;
+}
+.radar-wrap canvas {
+  max-width: 100%;
+}
+
+/* Dimension Scores */
+.scores-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+.score-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+.score-card .score-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+.score-card .score-label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.score-card .score-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+.score-card .score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+  width: 0%;
+}
+
+/* Analysis Cards */
+.analysis-section {
+  margin-top: 24px;
+}
+.analysis-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.analysis-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.analysis-card h4 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+.analysis-card .level {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+.level-high { background: rgba(52,211,153,0.15); color: var(--accent3); }
+.level-mid { background: rgba(251,191,36,0.15); color: var(--accent5); }
+.level-low { background: rgba(244,114,182,0.15); color: var(--accent4); }
+
+.analysis-card p {
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.analysis-card .suggestion {
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(96,165,250,0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+/* Overall */
+.overall-summary {
+  background: linear-gradient(135deg, rgba(96,165,250,0.1), rgba(167,139,250,0.1));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.overall-summary h3 {
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.overall-summary p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+/* Methodology Note */
+.methodology {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+.methodology h4 { color: var(--text); margin-bottom: 8px; font-size: 0.95rem; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header h1 { font-size: 1.8rem; }
+  .question-card { padding: 24px 18px; }
+  .dimension-preview { grid-template-columns: 1fr; }
+  .scores-grid { grid-template-columns: 1fr; }
+  .container { padding: 16px 14px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Nav buttons */
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.nav-buttons .btn-secondary { flex: 1; text-align: center; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Intro -->
+  <div id="introScreen">
+    <div class="header">
+      <h1>🧠 现代思维评估</h1>
+      <p>Modern Mind Assessment</p>
+    </div>
+
+    <div class="intro-section">
+      <h2>这个测试在测什么？</h2>
+      <p>这不像MBTI那样把你塞进一个类型，也不像IQ那样给你一个冷冰冰的分数。这份测试评估的是——</p>
+      <ul>
+        <li><strong>你面对信息时，是否会主动质疑？</strong>（批判性思维）</li>
+        <li><strong>你能否看到事物背后的系统？</strong>（系统思维）</li>
+        <li><strong>你是否了解自己的思维盲区？</strong>（自我觉察）</li>
+        <li><strong>你能否在信息洪流中保持清醒？</strong>（信息素养）</li>
+        <li><strong>你的选择是否出于自觉？</strong>（价值判断）</li>
+      </ul>
+      <p style="margin-top:16px;">没有"及格"或"天才"，只有一份属于你的思维剖面图。</p>
+    </div>
+
+    <div class="intro-section">
+      <h2>四大维度</h2>
+      <div class="dimension-preview">
+        <div class="dim-card">
+          <div class="dim-icon">🧠</div>
+          <div class="dim-name">认知力</div>
+          <div class="dim-sub">你如何处理信息</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">👁️</div>
+          <div class="dim-name">自省力</div>
+          <div class="dim-sub">你如何认识自己</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">⚡</div>
+          <div class="dim-name">执行力</div>
+          <div class="dim-sub">你如何行动</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-icon">🧭</div>
+          <div class="dim-name">价值力</div>
+          <div class="dim-sub">你如何选择</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="intro-section">
+      <h2>测试须知</h2>
+      <ul>
+        <li>共 <strong>20 道情境判断题</strong>，没有标准答案</li>
+        <li>选择<strong>最接近你真实反应</strong>的选项，而非"更好的"选项</li>
+        <li>预计用时 8-12 分钟</li>
+        <li>结果不会上传任何数据，完全本地计算</li>
+      </ul>
+    </div>
+
+    <button class="btn-primary" onclick="startTest()">开始测试 →</button>
+  </div>
+
+  <!-- Questions -->
+  <div id="testScreen" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">第 1 题 / 共 20 题</div>
+    </div>
+
+    <div id="questionContainer"></div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" id="prevBtn" onclick="prevQuestion()" style="display:none;">← 上一题</button>
+      <button class="btn-secondary" id="nextBtn" onclick="nextQuestion()" style="display:none; flex:1; text-align:center; border-color: var(--accent); color: var(--accent);">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="resultScreen" class="result-section">
+    <div class="result-header">
+      <h2>你的思维剖面图</h2>
+      <p>基于20道情境判断题的综合分析</p>
+    </div>
+
+    <div class="radar-wrap">
+      <canvas id="radarCanvas" width="420" height="420"></canvas>
+    </div>
+
+    <div class="scores-grid" id="scoresGrid"></div>
+
+    <div class="overall-summary" id="overallSummary"></div>
+
+    <div class="analysis-section" id="analysisSection"></div>
+
+    <div class="methodology">
+      <h4>📋 关于这份测试</h4>
+      <p>
+        这份测试采用<strong>情境判断测试（SJT）</strong>范式，不使用知识型选择题或自陈式量表。
+        每道题呈现一个真实生活场景，不同选项对应不同的思维层级。
+        结果以<strong>分维度剖面图</strong>呈现，不做加权总分，避免简化多维能力为单一数字。
+        本测试为原型版本，旨在引发思考而非提供诊断。得分仅供参考。
+      </p>
+    </div>
+
+    <button class="btn-primary" onclick="location.reload()">重新测试</button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const questions = [
+  // ===== 认知力 (Questions 1-6) =====
+  {
+    id: 1, dimension: 'cognition', sub: 'critical',
+    scenario: '你看到一篇爆款文章标题写"哈佛研究发现：每天喝咖啡延长寿命20%"。',
+    question: '你的第一反应是什么？',
+    options: [
+      { text: '马上转发给家人朋友，这个消息很重要', score: 0, note: '未启动信息验证机制' },
+      { text: '点进去看看具体是怎么说的', score: 2, note: '有基础好奇心，但缺乏主动质疑' },
+      { text: '先想：20%这个数字合理吗？样本量多大？有没有对照组？然后点进去验证', score: 4, note: '批判性思维主动启动' },
+      { text: '不仅质疑这篇研究，还会思考：这类文章为什么容易传播？什么心理机制让我本能想转发？', score: 5, note: '批判思维 + 系统思维双重启动' }
+    ]
+  },
+  {
+    id: 2, dimension: 'cognition', sub: 'systems',
+    scenario: '你所在的公司业绩下滑，老板决定全员降薪10%来降低成本。',
+    question: '你怎么看待这个决定？',
+    options: [
+      { text: '理解老板的难处，公司活下来最重要', score: 1, note: '线性思维，只看直接因果' },
+      { text: '降薪可能导致优秀人才流失，反而进一步损害业绩', score: 3, note: '能看到二阶效应' },
+      { text: '分析完整系统：降薪→士气下降→产出降低→客户满意度下降→营收进一步下滑→更多降薪...这是一个恶性循环', score: 5, note: '系统思维，能识别正反馈循环' },
+      { text: '先调查：业绩下滑的根本原因是什么？降薪是否对症？有没有更好的杠杆点？', score: 4, note: '寻找根因，而非被动应对' }
+    ]
+  },
+  {
+    id: 3, dimension: 'cognition', sub: 'probability',
+    scenario: '你朋友告诉你，他认识的一个人买彩票中了500万，劝你也试试。',
+    question: '你怎么回应？',
+    options: [
+      { text: '真的吗？那我也去买几张试试运气', score: 0, note: '被个案锚定，忽略基础概率' },
+      { text: '中了是运气好，但我还是觉得概率太低不太想买', score: 2, note: '直觉上知道概率低，但缺乏精确理解' },
+      { text: '幸存者偏差——中大奖的人会被传播，没中的人不会。几百万分之一的基础概率不会因为听到一个案例就改变', score: 5, note: '理解幸存者偏差和基础概率' },
+      { text: '我算一下期望值：一张彩票2元，中500万概率约千万分之一，期望收益远低于成本。不买', score: 4, note: '量化思维，用期望值做决策' }
+    ]
+  },
+  {
+    id: 4, dimension: 'cognition', sub: 'critical',
+    scenario: '一位你很尊敬的行业专家在公开演讲中说："人工智能将在3年内取代80%的白领工作。"',
+    question: '你如何处理这个信息？',
+    options: [
+      { text: '这位专家很权威，应该是真的，我需要赶紧学新技能', score: 1, note: '诉诸权威，未独立验证' },
+      { text: '80%这个数字太绝对了，但AI确实在快速发展，我会保持关注', score: 2, note: '直觉质疑，但缺乏深入分析' },
+      { text: '追溯信源：这个80%是怎么得出的？样本是什么？定义"取代"的标准是什么？然后查看是否有其他研究者持不同观点', score: 5, note: '完整的信息素养 + 批判验证' },
+      { text: '先检查这位专家是否在这件事上有利益关联（比如卖AI课程），再评估其论证逻辑是否站得住', score: 4, note: '动机分析 + 逻辑评估' }
+    ]
+  },
+  {
+    id: 5, dimension: 'cognition', sub: 'systems',
+    scenario: '你所在城市最近交通事故明显增多，市里决定大幅提高罚款金额。',
+    question: '你怎么看待这个措施？',
+    options: [
+      { text: '罚得重大家就不敢违规了，支持', score: 1, note: '简单线性因果思维' },
+      { text: '短期可能有效，但长期大家会适应罚金水平，回归原状', score: 3, note: '能预判适应性反应' },
+      { text: '交通事故增多的根本原因是什么？是道路设计？交通规划？驾驶员培训？还是执法力度？需要找到真正的问题源头', score: 5, note: '根因分析思维' },
+      { text: '提高罚金可能让穷人受罚更重、富人无所谓，这公平吗？政策效果和公平性都要评估', score: 4, note: '多维度政策评估' }
+    ]
+  },
+  {
+    id: 6, dimension: 'cognition', sub: 'probability',
+    scenario: '你连续3天出门都没带伞，结果都没下雨。第4天你要出门了。',
+    question: '你怎么决定带不带伞？',
+    options: [
+      { text: '都连着没下雨了，肯定不会下，不带', score: 0, note: '赌徒谬误：用过去结果预测独立事件' },
+      { text: '看天气预报再决定', score: 2, note: '理性但未完全理解概率' },
+      { text: '每天的天气是独立事件，之前没下不代表今天不会下。看气象数据和降水概率来做决策', score: 5, note: '理解事件独立性 + 数据驱动' },
+      { text: '出门看一眼窗外，结合天气预报和降水概率。而且随身带把伞也没什么成本', score: 4, note: '务实决策，考虑边际成本' }
+    ]
+  },
+
+  // ===== 自省力 (Questions 7-11) =====
+  {
+    id: 7, dimension: 'selfaware', sub: 'selfawareness',
+    scenario: '你在一次团队讨论中被同事指出"你总是用一种居高临下的方式说话"。',
+    question: '你的第一反应是？',
+    options: [
+      { text: '"我哪有居高临下？你就是太敏感了"', score: 0, note: '防御性反应，拒绝接受反馈' },
+      { text: '心里有点不舒服，但嘴上说"好的我知道了"，不想深究', score: 2, note: '回避情绪，表面接受' },
+      { text: '先感到不适，然后意识到这种不适本身就是一种防御反应。告诉自己先不反驳，回去回忆具体场景再判断', score: 5, note: '高阶自我觉察：观察自己的情绪反应' },
+      { text: '直接问对方"能不能举个具体例子？我想了解一下我哪里让你有这种感觉"', score: 4, note: '开放态度，主动获取具体反馈' }
+    ]
+  },
+  {
+    id: 8, dimension: 'selfaware', sub: 'resilience',
+    scenario: '你花了一个月准备的项目方案，在汇报时被领导全盘否定。',
+    question: '你会怎么应对？',
+    options: [
+      { text: '觉得自己的能力被否定了，一整天心情很差', score: 1, note: '将批评内化为自我否定' },
+      { text: '很难过，但告诉自己失败是成功之母，明天就好了', score: 2, note: '用鸡汤压制情绪，未真正处理' },
+      { text: '允许自己难过一两个小时，然后分析：领导否定的核心点是什么？是方向问题、逻辑问题还是沟通问题？把"方案被否"和"我这个人不行"分开', score: 5, note: '情绪韧性与认知解绑' },
+      { text: '冷静地问领导具体哪些地方需要调整，把反馈转化为改进清单', score: 4, note: '结果导向，但可能压抑了情绪处理' }
+    ]
+  },
+  {
+    id: 9, dimension: 'selfaware', sub: 'metacognition',
+    scenario: '你发现自己最近经常在社交媒体上花大量时间刷短视频，意识到这可能不是好事。',
+    question: '你怎么处理这个觉察？',
+    options: [
+      { text: '卸载App，强迫自己不刷', score: 2, note: '简单压制，但没理解根本原因' },
+      { text: '没多想，大家都在刷嘛，没什么大不了的', score: 0, note: '合理化行为，回避觉察' },
+      { text: '问自己：我在什么情绪状态下最容易去刷？无聊？焦虑？逃避？找到触发点比卸载App更重要', score: 5, note: '元认知：观察行为背后的心理动机' },
+      { text: '设置每天使用时长限制，用更有意义的事填充空闲时间', score: 3, note: '行为管理，但缺乏深层自我理解' }
+    ]
+  },
+  {
+    id: 10, dimension: 'selfaware', sub: 'metacognition',
+    scenario: '你在做一个重要决定（比如跳槽），内心有两个声音在拉扯。',
+    question: '你怎么处理这种内心冲突？',
+    options: [
+      { text: '听从直觉，感觉哪个对就选哪个', score: 1, note: '将冲动理性化' },
+      { text: '列一个优缺点清单，看哪个选项得分更高', score: 3, note: '理性分析，但可能遗漏隐含假设' },
+      { text: '观察这两个"声音"分别是什么：是恐惧在说话？还是欲望？还是价值观？把决策中的情绪成分和逻辑成分拆开来看', score: 5, note: '元认知拆解：观察自己的决策过程' },
+      { text: '找朋友聊聊，听听别人的意见再做决定', score: 2, note: '外部依赖，未深入自我分析' }
+    ]
+  },
+  {
+    id: 11, dimension: 'selfaware', sub: 'resilience',
+    scenario: '你发现你一直坚信的某个观点（比如对某个社会议题的看法）在新证据面前可能是错的。',
+    question: '你会？',
+    options: [
+      { text: '忽略这个新证据，坚持自己的观点', score: 0, note: '信念固着，拒绝修正' },
+      { text: '有点不舒服，但告诉自己人无完人，尽量接受吧', score: 2, note: '被动接受，缺乏主动分析' },
+      { text: '意识到不舒服是正常的——改变信念意味着承认自己"曾经错了"。但正是因为这种不适感，才知道自己正在成长', score: 5, note: '高阶心理韧性：拥抱认知失调作为成长信号' },
+      { text: '仔细研究新证据的质量，如果确实可靠就更新观点，并记录这次认知修正的经历', score: 4, note: '贝叶斯式信念更新' }
+    ]
+  },
+
+  // ===== 执行力 (Questions 12-16) =====
+  {
+    id: 12, dimension: 'action', sub: 'delayed_gratification',
+    scenario: '你刚领到一笔奖金。一个朋友推荐你一个"高回报"投资项目，说一个月就能翻倍。另一个选择是把钱存定期。',
+    question: '你怎么选？',
+    options: [
+      { text: '一个月翻倍？太诱人了，投！', score: 0, note: '即时满足驱动，无视风险信号' },
+      { text: '先存定期，安全第一', score: 2, note: '风险回避但未分析' },
+      { text: '"月翻倍"的年化收益率是4095%——这在正规金融市场中不可能。高收益必然伴随高风险或本身就是骗局。先研究这个项目的底层逻辑', score: 5, note: '金融素养 + 第一性原理' },
+      { text: '问朋友要详细信息，自己做风险评估后再决定', score: 3, note: '谨慎但可能未识别出红牌信号' }
+    ]
+  },
+  {
+    id: 13, dimension: 'action', sub: 'info_literacy',
+    scenario: '你对一个健康话题（比如"间歇性断食是否有益"）产生了兴趣，想深入了解。',
+    question: '你会怎么获取信息？',
+    options: [
+      { text: '在百度/小红书上搜索，看排名靠前的文章', score: 0, note: '依赖算法推荐，未评估信源质量' },
+      { text: '问身边有经验的朋友，或者看看网红医生怎么说', score: 1, note: '依赖二手信息，信源未验证' },
+      { text: '先去PubMed搜原始研究论文，看随机对照试验的结果，再看综述文章和荟萃分析', score: 5, note: '追溯一手文献，信源阶梯完整' },
+      { text: '搜索后看几篇不同来源的文章，对比他们的说法是否一致', score: 3, note: '交叉验证意识，但信源质量未把控' }
+    ]
+  },
+  {
+    id: 14, dimension: 'action', sub: 'first_principles',
+    scenario: '你想学一门新技能（比如编程），面对海量的在线课程、教程和书籍。',
+    question: '你怎么开始？',
+    options: [
+      { text: '报一个最热门的课程，跟着学', score: 1, note: '随大流，未思考自己的需求' },
+      { text: '先问身边会编程的朋友推荐入门资源', score: 2, note: '依赖他人经验' },
+      { text: '先问自己：我学编程的最终目的是什么？解决什么问题？从这个目标倒推，我需要掌握的最小知识集是什么？然后只学这些', score: 5, note: '第一性原理 + 目标导向' },
+      { text: '先看几个免费入门视频试试水，找到感兴趣的方向再深入', score: 3, note: '探索式学习，灵活但可能缺乏方向' }
+    ]
+  },
+  {
+    id: 15, dimension: 'action', sub: 'delayed_gratification',
+    scenario: '你制定了每周读一本书的计划，坚持了三周后感到有些疲倦。',
+    question: '你会？',
+    options: [
+      { text: '累了就休息吧，计划可以放一放', score: 1, note: '容易被即时舒适感驱动' },
+      { text: '逼自己继续，不管多累都必须读完', score: 2, note: '意志力消耗模式，不可持续' },
+      { text: '分析疲倦的原因：是书太难？太无聊？还是太忙？调整策略（比如换书、调整时间、降低频率）而不是放弃目标', score: 5, note: '策略性调整而非放弃或硬撑' },
+      { text: '降低频率，两周读一本也行，关键是保持习惯', score: 3, note: '务实但可能降低标准太多' }
+    ]
+  },
+  {
+    id: 16, dimension: 'action', sub: 'info_literacy',
+    scenario: '你在社交媒体上看到一条新闻，配图触目惊心，标题情绪化很强，评论区一片愤怒。',
+    question: '你怎么处理这条信息？',
+    options: [
+      { text: '跟着一起愤怒，转发扩散让更多人看到', score: 0, note: '被情绪驱动，成为传播节点' },
+      { text: '先收藏，有空再详细了解', score: 1, note: '延迟但未主动验证' },
+      { text: '克制住情绪反应，先查：这条新闻有没有其他权威媒体报到？图片是否为旧图？事件是否有完整时间线？', score: 5, note: '情绪调节 + 信息验证双重启动' },
+      { text: '看看评论区有没有人提出质疑，参考一下不同声音', score: 2, note: '有交叉验证意识但方式被动' }
+    ]
+  },
+
+  // ===== 价值力 (Questions 17-20) =====
+  {
+    id: 17, dimension: 'value', sub: 'value_clarity',
+    scenario: '你25岁，父母希望你回老家考公务员，但你在北京有一份自己喜欢但收入不高的工作。',
+    question: '你怎么做决定？',
+    options: [
+      { text: '听父母的吧，他们经验多，为我好', score: 1, note: '依附外部权威，未形成独立价值判断' },
+      { text: '我的人生我自己做主，不管他们说什么', score: 2, note: '叛逆式独立，未进行深度思考' },
+      { text: '梳理自己的核心价值观：我更看重什么？安全感？自由？成长？然后评估两种选择分别对哪个价值更优，做出有意识的选择并接受代价', score: 5, note: '价值自觉 + 代价意识' },
+      { text: '两边都不选，先在北京积累经验，以后有机会再回去', score: 2, note: '回避决策' }
+    ]
+  },
+  {
+    id: 18, dimension: 'value', sub: 'empathy',
+    scenario: '你在网上看到一个和你观点完全不同的人写的文章，你觉得他的观点很荒谬。',
+    question: '你会？',
+    options: [
+      { text: '直接评论反驳，或者划过去不看', score: 1, note: '二元对立思维，拒绝理解' },
+      { text: '理解他有权持有不同观点，但我不认同', score: 2, note: '表面包容，缺乏深入理解' },
+      { text: '问自己：如果我拥有他的成长经历、教育背景和生活环境，我会不会也这样想？尝试进入他的认知框架，理解结论背后的逻辑链', score: 5, note: '认知共情：理解而非同意' },
+      { text: '看看评论区有没有人做了有力反驳，帮我节省时间', score: 1, note: '依赖他人思考' }
+    ]
+  },
+  {
+    id: 19, dimension: 'value', sub: 'continuous_learning',
+    scenario: '你在工作中遇到一个完全陌生的领域，需要你快速上手。',
+    question: '你会怎么学习？',
+    options: [
+      { text: '让领导安排培训或者找一个懂的人教我', score: 1, note: '被动学习依赖' },
+      { text: '在网上搜几篇教程，照着做就行', score: 2, note: '碎片化学习，缺乏系统' },
+      { text: '先构建这个领域的知识框架：核心概念是什么？关键变量有哪些？因果逻辑链是怎样的？然后填入细节。边学边用，在实践中学', score: 5, note: '自主构建知识体系 + 实践闭环' },
+      { text: '买一本该领域的入门书，从头到尾读一遍', score: 3, note: '系统学习但可能效率低' }
+    ]
+  },
+  {
+    id: 20, dimension: 'value', sub: 'value_clarity',
+    scenario: '你的社交圈里大家都在谈论买房、结婚、生子，你感到了无形的压力。',
+    question: '你怎么面对这种压力？',
+    options: [
+      { text: '既然大家都在做，我也应该跟上节奏', score: 0, note: '社会顺从，无独立价值判断' },
+      { text: '告诉自己不要被影响，我的人生自己做主', score: 2, note: '有独立意识，但仅停留在口号层面' },
+      { text: '区分"社会期望"和"我真正想要的"。列出这些人生事件对我的意义：是我自己想要的，还是别人告诉我应该想要的？然后诚实地回答自己', score: 5, note: '深度价值解构与重建' },
+      { text: '暂时不做决定，走一步看一步', score: 1, note: '回避价值审视' }
+    ]
+  }
+];
+
+// ===== STATE =====
+let currentQ = 0;
+let answers = new Array(questions.length).fill(-1);
+
+const dimensionMeta = {
+  cognition: {
+    name: '🧠 认知力',
+    tag: '你如何处理信息',
+    color: '#60a5fa',
+    subs: {
+      critical: { name: '批判性思维', icon: '🔍' },
+      systems: { name: '系统思维', icon: '🕸️' },
+      probability: { name: '概率思维', icon: '🎲' }
+    }
+  },
+  selfaware: {
+    name: '👁️ 自省力',
+    tag: '你如何认识自己',
+    color: '#a78bfa',
+    subs: {
+      selfawareness: { name: '自我觉察', icon: '🪞' },
+      resilience: { name: '情绪韧性', icon: '💎' },
+      metacognition: { name: '元认知', icon: '🧘' }
+    }
+  },
+  action: {
+    name: '⚡ 执行力',
+    tag: '你如何行动',
+    color: '#34d399',
+    subs: {
+      delayed_gratification: { name: '延迟满足', icon: '🎯' },
+      info_literacy: { name: '信息素养', icon: '📡' },
+      first_principles: { name: '第一性原理', icon: '🔬' }
+    }
+  },
+  value: {
+    name: '🧭 价值力',
+    tag: '你如何选择',
+    color: '#f472b6',
+    subs: {
+      value_clarity: { name: '价值自觉', icon: '💎' },
+      empathy: { name: '共情能力', icon: '🤝' },
+      continuous_learning: { name: '持续学习', icon: '📚' }
+    }
+  }
+};
+
+const tagClassMap = {
+  cognition: 'tag-cognition',
+  selfaware: 'tag-selfaware',
+  action: 'tag-action',
+  value: 'tag-value'
+};
+
+// ===== FUNCTIONS =====
+function startTest() {
+  document.getElementById('introScreen').classList.add('hidden');
+  document.getElementById('testScreen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const meta = dimensionMeta[q.dimension];
+  const tagClass = tagClassMap[q.dimension];
+
+  let html = `
+    <div class="question-card">
+      <span class="dimension-tag ${tagClass}">${meta.name} · ${meta.subs[q.sub].name}</span>
+      <div class="question-number">第 ${currentQ + 1} 题</div>
+      <div class="question-text">
+        <div style="color:var(--text-dim); font-size:0.92rem; margin-bottom:10px; font-style:italic; line-height:1.7;">${q.scenario}</div>
+        ${q.question}
+      </div>
+      <div class="options" id="optionsWrap">
+  `;
+
+  q.options.forEach((opt, i) => {
+    const labels = ['A', 'B', 'C', 'D'];
+    const selected = answers[currentQ] === i ? ' selected' : '';
+    html += `
+      <button class="option-btn${selected}" onclick="selectOption(${i})" id="opt_${i}">
+        <span class="option-label">${labels[i]}.</span>${opt.text}
+      </button>
+    `;
+  });
+
+  html += `</div></div>`;
+  document.getElementById('questionContainer').innerHTML = html;
+
+  // Progress
+  const pct = ((currentQ + 1) / questions.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `第 ${currentQ + 1} 题 / 共 ${questions.length} 题`;
+
+  // Nav buttons
+  document.getElementById('prevBtn').style.display = currentQ > 0 ? 'inline-block' : 'none';
+  document.getElementById('nextBtn').style.display = 'block';
+  document.getElementById('nextBtn').textContent = currentQ === questions.length - 1 ? '查看结果 →' : '下一题 →';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectOption(idx) {
+  answers[currentQ] = idx;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+  });
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === -1) return;
+  if (currentQ < questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('testScreen').classList.add('hidden');
+  const resultScreen = document.getElementById('resultScreen');
+  resultScreen.classList.add('active');
+
+  // Calculate scores
+  const scores = {};
+  Object.keys(dimensionMeta).forEach(d => {
+    scores[d] = { total: 0, max: 0, count: 0 };
+  });
+
+  questions.forEach((q, i) => {
+    if (answers[i] >= 0) {
+      scores[q.dimension].total += q.options[answers[i]].score;
+      scores[q.dimension].max += 5;
+      scores[q.dimension].count++;
+    }
+  });
+
+  const finalScores = {};
+  Object.keys(scores).forEach(d => {
+    const s = scores[d];
+    if (s.max > 0) {
+      finalScores[d] = Math.round((s.total / s.max) * 100);
+    } else {
+      finalScores[d] = 0;
+    }
+  });
+
+  // Render scores grid
+  const gridHtml = Object.keys(dimensionMeta).map(d => {
+    const meta = dimensionMeta[d];
+    const score = finalScores[d];
+    let level, levelClass;
+    if (score >= 70) { level = '较强'; levelClass = 'level-high'; }
+    else if (score >= 45) { level = '中等'; levelClass = 'level-mid'; }
+    else { level = '待提升'; levelClass = 'level-low'; }
+
+    return `
+      <div class="score-card">
+        <div class="score-value" style="color:${meta.color}">${score}<span style="font-size:1rem;color:var(--text-dim)">%</span></div>
+        <div class="score-label">${meta.name} <span class="${levelClass}" style="font-size:0.75rem;padding:2px 6px;border-radius:10px;">${level}</span></div>
+        <div class="score-label" style="font-size:0.78rem">${meta.tag}</div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill" style="background:${meta.color}" data-width="${score}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('scoresGrid').innerHTML = gridHtml;
+
+  // Animate score bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width;
+    });
+  }, 200);
+
+  // Radar chart
+  drawRadar(finalScores);
+
+  // Overall summary
+  const avg = Math.round(Object.values(finalScores).reduce((a, b) => a + b, 0) / 4);
+  let summaryText;
+  if (avg >= 80) {
+    summaryText = `你的综合思维水平处于较高区间（${avg}%）。你具备较强的批判意识、系统视角和自我觉察能力。建议你关注：如何将这些思维习惯转化为对他人有影响力的影响力？`;
+  } else if (avg >= 60) {
+    summaryText = `你的综合思维水平处于中等偏上区间（${avg}%）。你已经在多个维度上展现了现代思维的核心特质，同时还有一些明确可提升的方向。继续往下看详细分析。`;
+  } else if (avg >= 40) {
+    summaryText = `你的综合思维水平处于中等区间（${avg}%）。这说明你有一定的思维能力基础，但很多维度还处于"知道但未形成习惯"的阶段。好消息是——这些能力完全可以训练。`;
+  } else {
+    summaryText = `你的综合思维水平处于较低区间（${avg}%）。但这不代表你"不行"——这代表你的思维习惯有大量升级空间。绝大多数人都不是天生具备这些能力的，它们是后天训练的结果。`;
+  }
+
+  document.getElementById('overallSummary').innerHTML = `
+    <h3>📊 综合评估：${avg}%</h3>
+    <p>${summaryText}</p>
+  `;
+
+  // Detailed analysis
+  const analysisData = {
+    cognition: {
+      high: '你在认知层面表现突出。面对信息时，你能够主动质疑、追根溯源，不轻易被表面结论牵着走。你理解复杂系统中的反馈和涌现效应，且能以概率思维看待世界的不确定性。这是现代公民最稀缺的能力之一。',
+      mid: '你在认知层面有一定基础，但还不够稳定。有时你会启动批判思维，有时又会本能地接受信息。关键是让批判性思维从"偶尔启动"变成"默认模式"。建议：每次看到有冲击力的标题时，强制自己问3个问题再判断。',
+      low: '认知力是你的主要提升方向。你可能习惯于快速接受信息，较少主动质疑来源和逻辑。建议从小事开始练习：看到任何"惊人结论"，先问"证据是什么？来源是谁？有没有其他解释？"。坚持一个月，你会发现自己看世界的方式开始变化。'
+    },
+    selfaware: {
+      high: '你在自我认知方面表现优秀。你不仅能觉察自己的情绪，还能"观察自己在思考"。面对批评和挫折时，你能将事件和自我价值解绑，这是高心理韧性的标志。你对自身盲区有清醒的认识。',
+      mid: '你有基本的自我觉察能力，但在高压或情绪化情境下可能"丢失观察者视角"。建议尝试正念冥想——不是追求什么境界，而是训练"在情绪中保持观察"的能力。每天10分钟，坚持8周会有显著变化。',
+      low: '自省力是你的主要提升方向。你可能较少审视自己的思维过程和情绪模式。建议：每天睡前花5分钟写"今日觉察日记"——今天在什么时候情绪波动了？为什么？我当时是怎么想的？这种简单的反思练习能显著提升自我觉察。'
+    },
+    action: {
+      high: '你在执行力维度表现突出。你具备延迟满足的能力，信息素养扎实，且能从第一性原理出发解决问题。这些能力让你在信息洪流中保持清醒，在面对诱惑时保持定力。',
+      mid: '你的执行力处于中等水平。你可能知道应该怎么做，但在执行层面还不够稳定。建议：针对信息素养，建立一个"信源分级清单"——哪些是一手信源（论文、官方数据），哪些是二手加工，遇到重要信息只信一手。',
+      low: '执行力是你的主要提升方向。你可能在面对信息时缺乏验证习惯，或在长期目标面前容易向短期满足妥协。建议：从最简单的开始——每次想转发任何内容之前，先花30秒查一下来源。这个小习惯能显著提升你的信息素养。'
+    },
+    value: {
+      high: '你在价值判断层面表现优秀。你有清晰的价值观体系，能区分"社会期望"和"我真正想要"。你具备认知共情能力，能在不认同对方立场的情况下理解其背后的逻辑链。',
+      mid: '你在价值层面有一定自觉，但可能在某些情境下容易被社会压力或他人期望影响。建议：定期做"价值观审计"——列出你最近做的重要决定，分析每个决定是出于自己的价值判断还是外部压力。',
+      low: '价值力是你的主要提升方向。你可能较多地跟随社会主流期望或他人建议做决定，较少深入审视"这真的是我想要的吗？"。建议：找一个安静的下午，写下"对我最重要的5件事"，然后检查你最近的行为是否与之一致。如果不一致，问自己为什么。'
+    }
+  };
+
+  let analysisHtml = '<h3>🔍 分维度详细分析</h3>';
+  Object.keys(dimensionMeta).forEach(d => {
+    const meta = dimensionMeta[d];
+    const score = finalScores[d];
+    let level, levelClass, analysis;
+    if (score >= 70) { level = '较强'; levelClass = 'level-high'; analysis = analysisData[d].high; }
+    else if (score >= 45) { level = '中等'; levelClass = 'level-mid'; analysis = analysisData[d].mid; }
+    else { level = '待提升'; levelClass = 'level-low'; analysis = analysisData[d].low; }
+
+    // Find weakest sub-dimension
+    const subScores = {};
+    questions.forEach((q, i) => {
+      if (q.dimension === d && answers[i] >= 0) {
+        if (!subScores[q.sub]) subScores[q.sub] = { total: 0, count: 0 };
+        subScores[q.sub].total += q.options[answers[i]].score;
+        subScores[q.sub].count++;
+      }
+    });
+
+    let weakSub = '';
+    let weakScore = 100;
+    Object.keys(meta.subs).forEach(s => {
+      if (subScores[s] && subScores[s].count > 0) {
+        const avg = (subScores[s].total / (subScores[s].count * 5)) * 100;
+        if (avg < weakScore) { weakScore = avg; weakSub = meta.subs[s].name; }
+      }
+    });
+
+    analysisHtml += `
+      <div class="analysis-card">
+        <h4 style="color:${meta.color}">${meta.name} <span class="${levelClass}">${level}</span></h4>
+        <p>${analysis}</p>
+        ${weakSub ? `<div class="suggestion">💡 相对薄弱点：<strong>${weakSub}</strong>。针对这个子维度做专项练习，提升效果最明显。</div>` : ''}
+      </div>
+    `;
+  });
+  document.getElementById('analysisSection').innerHTML = analysisHtml;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function drawRadar(scores) {
+  const canvas = document.getElementById('radarCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  const cx = W / 2;
+  const cy = H / 2;
+  const R = 160;
+
+  const dims = Object.keys(dimensionMeta);
+  const n = dims.length;
+  const angleStep = (Math.PI * 2) / n;
+  const startAngle = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw grid rings
+  for (let ring = 1; ring <= 4; ring++) {
+    const r = (R / 4) * ring;
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const angle = startAngle + angleStep * (i % n);
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw axis lines and labels
+  dims.forEach((d, i) => {
+    const angle = startAngle + angleStep * i;
+    const x = cx + R * Math.cos(angle);
+    const y = cy + R * Math.sin(angle);
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.stroke();
+
+    // Label
+    const labelR = R + 24;
+    const lx = cx + labelR * Math.cos(angle);
+    const ly = cy + labelR * Math.sin(angle);
+    ctx.font = '600 13px -apple-system, sans-serif';
+    ctx.fillStyle = dimensionMeta[d].color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(dimensionMeta[d].name.replace(/[^\u4e00-\u9fff]/g, '').trim() || dimensionMeta[d].name, lx, ly);
+  });
+
+  // Draw data polygon
+  ctx.beginPath();
+  dims.forEach((d, i) => {
+    const angle = startAngle + angleStep * i;
+    const val = scores[d] / 100;
+    const r = R * val;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+
+  // Fill
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  grad.addColorStop(0, 'rgba(96,165,250,0.25)');
+  grad.addColorStop(1, 'rgba(167,139,250,0.08)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Stroke
+  ctx.strokeStyle = 'rgba(96,165,250,0.8)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Draw data points
+  dims.forEach((d, i) => {
+    const angle = startAngle + angleStep * i;
+    const val = scores[d] / 100;
+    const r = R * val;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = dimensionMeta[d].color;
+    ctx.fill();
+    ctx.strokeStyle = '#0f1117';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Score label
+    ctx.font = 'bold 12px -apple-system, sans-serif';
+    ctx.fillStyle = '#e4e4e7';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(scores[d] + '%', x, y - 10);
+  });
+}
+</script>
+
+</body>
+</html>
