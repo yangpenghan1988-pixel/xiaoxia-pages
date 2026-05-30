@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI人生银行 — 交互原型 v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap');
+
+:root {
+  --primary: #1a1a2e;
+  --primary-light: #16213e;
+  --accent: #e94560;
+  --accent-soft: rgba(233,69,96,0.12);
+  --gold: #f5a623;
+  --gold-soft: rgba(245,166,35,0.12);
+  --green: #27ae60;
+  --green-soft: rgba(39,174,96,0.1);
+  --blue: #60a5fa;
+  --blue-soft: rgba(96,165,250,0.1);
+  --purple: #a78bfa;
+  --purple-soft: rgba(167,139,250,0.1);
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --text: #1d1d1f;
+  --text-dim: #86868b;
+  --border: #e5e5ea;
+  --radius: 16px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.1);
+  --iphone-w: 390px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== NAV ===== */
+.top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(245,245,247,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.nav-logo span { color: var(--accent); }
+.nav-badge {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ===== FLOW SECTIONS ===== */
+.flow-section {
+  padding: 80px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flow-step-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.flow-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.flow-desc {
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 400px;
+  margin-bottom: 32px;
+}
+
+/* ===== IPHONE FRAME ===== */
+.iphone-frame {
+  width: var(--iphone-w);
+  background: var(--card);
+  border-radius: 40px;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.05);
+  overflow: hidden;
+  position: relative;
+}
+.iphone-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 28px;
+  background: #000;
+  border-radius: 0 0 20px 20px;
+  z-index: 10;
+}
+
+.iphone-statusbar {
+  height: 50px;
+  padding: 14px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #000;
+  position: relative;
+  z-index: 11;
+}
+.iphone-statusbar .time { font-weight: 700; }
+
+.iphone-content {
+  min-height: 580px;
+  position: relative;
+}
+
+.iphone-bottombar {
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.iphone-bottombar .bar {
+  width: 134px; height: 5px;
+  background: #000;
+  border-radius: 3px;
+  opacity: 0.2;
+}
+
+/* ===== STEP 1: IMPORT ===== */
+.import-screen {
+  padding: 0 20px 20px;
+}
+
+.import-hero {
+  text-align: center;
+  padding: 10px 0 20px;
+}
+.import-hero .emoji { font-size: 3rem; margin-bottom: 8px; }
+.import-hero h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.import-hero p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.import-tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+.import-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 10px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.import-tab.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.import-textarea {
+  width: 100%;
+  height: 200px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  line-height: 1.8;
+  resize: none;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.2s;
+}
+.import-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.import-textarea::placeholder { color: #c7c7cc; }
+
+.import-hint {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.import-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 16px;
+  background: var(--accent);
+  color: #fff;
+  transition: all 0.2s;
+}
+.import-btn:hover { opacity: 0.9; }
+.import-btn:disabled {
+  background: var(--border);
+  color: var(--text-dim);
+  cursor: default;
+}
+
+/* ===== STEP 2: DETECT ===== */
+.detect-screen {
+  padding: 0 20px 20px;
+}
+.detect-header {
+  text-align: center;
+  padding: 16px 0;
+}
+.detect-header .spinner {
+  display: inline-block;
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.detect-header p { font-size: 0.92rem; color: var(--text-dim); }
+
+.detect-result {
+  margin-top: 12px;
+}
+.detect-result h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.role-card:hover { border-color: var(--accent); }
+.role-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.role-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--bg);
+}
+.role-card.selected .role-avatar { background: var(--accent-soft); }
+
+.role-info { flex: 1; }
+.role-name { font-size: 0.95rem; font-weight: 700; }
+.role-meta { font-size: 0.78rem; color: var(--text-dim); }
+
+.role-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: transparent;
+  transition: all 0.2s;
+}
+.role-card.selected .role-check {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ===== STEP 3: PROFILE ===== */
+.profile-screen {
+  padding: 0 20px 20px;
+}
+.profile-header {
+  text-align: center;
+  padding: 16px 0 20px;
+}
+.profile-avatar-large {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--accent), #ff6b6b);
+  box-shadow: 0 4px 16px rgba(233,69,96,0.25);
+}
+.profile-header h3 { font-size: 1.15rem; font-weight: 800; }
+.profile-header .sub { font-size: 0.82rem; color: var(--text-dim); }
+
+.profile-accuracy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.profile-features {
+  margin: 16px 0;
+}
+.feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.feature-row:last-child { border: none; }
+.feature-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.fi-vocab { background: var(--accent-soft); }
+.fi-style { background: var(--blue-soft); }
+.fi-emoji { background: var(--gold-soft); }
+.fi-rhythm { background: var(--green-soft); }
+.fi-persona { background: var(--purple-soft); }
+
+.feature-text .label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.feature-text .value {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.style-tag {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text-dim);
+}
+
+.profile-note {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.profile-note strong { color: var(--text); }
+
+/* ===== STEP 4: CHAT ===== */
+.chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 580px;
+}
+
+.chat-topbar {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chat-topbar .back { font-size: 1.1rem; color: var(--accent); cursor: pointer; }
+.chat-topbar-info { flex: 1; }
+.chat-topbar-name { font-size: 0.95rem; font-weight: 700; }
+.chat-topbar-status { font-size: 0.75rem; color: var(--green); }
+.chat-topbar-menu { font-size: 0.78rem; color: var(--text-dim); cursor: pointer; }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-time-divider {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  padding: 8px 0;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  animation: bubbleIn 0.3s ease;
+}
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.chat-bubble.them {
+  align-self: flex-start;
+  background: var(--bg);
+  border-bottom-left-radius: 6px;
+  color: var(--text);
+}
+.chat-bubble.me {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
+.chat-bubble.typing {
+  display: flex;
+  gap: 4px;
+  padding: 14px 18px;
+}
+.chat-bubble.typing .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  animation: typingDot 1.4s infinite;
+}
+.chat-bubble.typing .dot:nth-child(2) { animation-delay: 0.2s; }
+.chat-bubble.typing .dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+.chat-input-bar {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+}
+.chat-input {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 24px;
+  background: var(--bg);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.chat-input:focus { outline: none; }
+.chat-input::placeholder { color: #c7c7cc; }
+.chat-send {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== STEP 5: VOICE ===== */
+.voice-screen {
+  padding: 0 20px 20px;
+}
+.voice-header {
+  text-align: center;
+  padding: 20px 0;
+}
+.voice-header h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+.voice-header p { font-size: 0.85rem; color: var(--text-dim); }
+
+.voice-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: 20px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+}
+.voice-upload-area:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.voice-upload-icon { font-size: 3rem; margin-bottom: 8px; }
+.voice-upload-text { font-size: 0.92rem; font-weight: 600; margin-bottom: 4px; }
+.voice-upload-hint { font-size: 0.78rem; color: var(--text-dim); }
+
+.voice-comparison {
+  margin-top: 16px;
+}
+.voice-comparison h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.voice-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+.voice-player.play-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.voice-player .info { flex: 1; }
+.voice-player .label { font-size: 0.85rem; font-weight: 600; }
+.voice-player .duration { font-size: 0.75rem; color: var(--text-dim); }
+.voice-player .wave {
+  flex: 0 0 60px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.voice-player .wave span {
+  width: 3px;
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.voice-note {
+  background: var(--green-soft);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--green);
+  line-height: 1.7;
+}
+
+/* ===== CONNECTOR ARROW ===== */
+.flow-connector {
+  text-align: center;
+  padding: 16px 0;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.flow-connector .line {
+  width: 40px; height: 1px;
+  background: var(--border);
+}
+.flow-connector .arrow { color: var(--accent); }
+
+/* ===== ANNOTATION ===== */
+.annotation {
+  max-width: var(--iphone-w);
+  margin: 0 auto;
+  padding: 16px 20px;
+  background: var(--card);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.annotation .label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.annotation p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 440px) {
+  :root { --iphone-w: 100%; }
+  .iphone-frame { border-radius: 0; box-shadow: none; }
+  .iphone-frame::before { display: none; }
+  .flow-section { padding: 60px 0 20px; }
+  .flow-title { font-size: 1.3rem; }
+}
+
+/* Divider between sections */
+.section-divider {
+  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <div class="nav-logo">🏦 AI<span>人生银行</span></div>
+  <div class="nav-badge">交互原型 v2</div>
+</nav>
+
+<!-- ===== STEP 1: IMPORT ===== -->
+<div class="flow-section" style="padding-top:80px;">
+  <div class="flow-step-label">STEP 1</div>
+  <h2 class="flow-title">粘贴聊天记录</h2>
+  <p class="flow-desc">只需要几十条对话，AI 就能学会一个人的说话方式</p>
+
+  <div class="iphone-frame">
+    <div class="iphone-statusbar">
+      <span class="time">15:30</span>
+      <span>100%</span>
+    </div>
+    <div class="iphone-content">
+      <div class="import-screen">
+        <div class="import-hero">
+          <div class="emoji">💬</div>
+          <h3>开始创建数字分身</h3>
+          <p>粘贴你和TA的聊天记录</p>
+        </div>
+
+        <div class="import-tabs">
+          <div class="import-tab active">粘贴文本</div>
+          <div class="import-tab">上传文件</div>
+        </div>
+
+        <div class="import-textarea" style="white-space:pre-wrap;">大刘：周末出来吃饭不
+小王：吃啥子嘛
+大刘：火锅噻，你不是一直想吃那个新开的
+小王：行嘛，几点
+大刘：6点？老地方
+小王：要得
+大刘：对了你带一下老陈
+小王：他又不是不认识路
+大刘：他开车来的嘛，顺便带一下你
+小王：好吧好吧
+大刘：哈哈你这人就是嘴上凶
+小王：滚
+大刘：😂😂😂
+小王：记得到时候给我留个清汤锅
+大刘：晓得晓得
+小王：上次你点的全是辣的，辣得我第二天拉肚子
+大刘：那是你没吃 Tulasi
+小王：啥子东西
+大刘：解辣的酸奶啊，印度那个
+小王：算了算了
+大刘：你最近工作咋样
+小王：莫提了，加班加到头秃
+大刘：又加班？你们老板真是的
+小王：还不是为了那点工资嘛
+大刘：要不要考虑换个工作嘛
+小王：说的轻巧，现在大环境这么差</div>
+
+        <div class="import-hint">微信、QQ、短信……任何对话文本都可以，50-100条效果更好</div>
+        <button class="import-btn">开始分析 →</button>
+      </div>
+    </div>
+    <div class="iphone-bottombar"><div class="bar"></div></div>
+  </div>
+
+  <div class="annotation" style="margin-top:20px;">
+    <div class="label">💡 设计要点</div>
+    <p>输入零门槛——直接粘贴文本即可。不绑定任何平台，不要求格式，用户手头有什么就粘贴什么。文本框里预填了示例数据，实际产品会是空白输入状态。</p>
+  </div>
+</div>
+
+<!-- CONNECTOR -->
+<div class="flow-connector">
+  <div class="line"></div>
+  <span class="arrow">↓</span>
+  <div class="line"></div>
+</div>
+
+<!-- ===== STEP 2: DETECT ===== -->
+<div class="flow-section">
+  <div class="flow-step-label">STEP 2</div>
+  <h2 class="flow-title">识别角色，选择克隆</h2>
+  <p class="flow-desc">AI 自动识别聊天中的角色，用户选择要克隆谁</p>
+
+  <div class="iphone-frame">
+    <div class="iphone-statusbar">
+      <span class="time">15:30</span>
+      <span>100%</span>
+    </div>
+    <div class="iphone-content">
+      <div class="detect-screen">
+        <div class="detect-header">
+          <p>🔍 分析完成，检测到 <strong>2 个角色</strong></p>
+        </div>
+
+        <div class="detect-result">
+          <h4>你想克隆谁？</h4>
+          <div class="role-list">
+            <div class="role-card" onclick="toggleRole(this)">
+              <div class="role-avatar">🧑</div>
+              <div class="role-info">
+                <div class="role-name">大刘</div>
+                <div class="role-meta">发送 10 条 · 主动发起对话 · 热情型</div>
+              </div>
+              <div class="role-check">✓</div>
+            </div>
+            <div class="role-card selected" onclick="toggleRole(this)">
+              <div class="role-avatar">👦</div>
+              <div class="role-info">
+                <div class="role-name">小王</div>
+                <div class="role-meta">发送 11 条 · 回应为主 · 嘴硬心软型</div>
+              </div>
+              <div class="role-check">✓</div>
+            </div>
+          </div>
+          <button class="import-btn">生成数字分身 →</button>
+        </div>
+      </div>
+    </div>
+    <div class="iphone-bottombar"><div class="bar"></div></div>
+  </div>
+
+  <div class="annotation" style="margin-top:20px;">
+    <div class="label">💡 设计要点</div>
+    <p>角色卡片上已经展示了初步分析（发言数量、对话风格标签），让用户在选之前就感受到"AI看懂了"。被选中的人是用户想留住的那个——这里默认选了"小王"，因为用户大概率是"大刘"（主动发起话题的一方）。</p>
+  </div>
+</div>
+
+<!-- CONNECTOR -->
+<div class="flow-connector">
+  <div class="line"></div>
+  <span class="arrow">↓</span>
+  <div class="line"></div>
+</div>
+
+<!-- ===== STEP 3: PROFILE ===== -->
+<div class="flow-section">
+  <div class="flow-step-label">STEP 3</div>
+  <h2 class="flow-title">说话风格画像</h2>
+  <p class="flow-desc">"哇，还挺像的"——这就是用户的第一刻惊喜</p>
+
+  <div class="iphone-frame">
+    <div class="iphone-statusbar">
+      <span class="time">15:31</span>
+      <span>98%</span>
+    </div>
+    <div class="iphone-content">
+      <div class="profile-screen">
+        <div class="profile-header">
+          <div class="profile-avatar-large">👦</div>
+          <h3>小王 的数字分身</h3>
+          <div class="sub">基于 21 条对话分析</div>
+          <div class="profile-accuracy">✓ 风格匹配度 87%</div>
+        </div>
+
+        <div class="profile-features">
+          <div class="feature-row">
+            <div class="feature-icon fi-vocab">🗣️</div>
+            <div class="feature-text">
+              <div class="label">常用口头禅</div>
+              <div class="value">"啥子" "嘛" "莫" "晓得" "要得"</div>
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-icon fi-style">✍️</div>
+            <div class="feature-text">
+              <div class="label">说话风格</div>
+              <div class="profile-tags">
+                <span class="style-tag">短句为主</span>
+                <span class="style-tag">直来直去</span>
+                <span class="style-tag">不爱铺垫</span>
+                <span class="style-tag">偶尔毒舌</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-icon fi-emoji">😀</div>
+            <div class="feature-text">
+              <div class="label">表情习惯</div>
+              <div class="value">极少使用表情，"滚" 代替90%的情绪表达</div>
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-icon fi-rhythm">⏱️</div>
+            <div class="feature-text">
+              <div class="label">聊天节奏</div>
+              <div class="value">回应快，但不主动发起。被问才答，答完等下一个问题</div>
+            </div>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-icon fi-persona">🧩</div>
+            <div class="feature-text">
+              <div class="label">性格画像</div>
+              <div class="value"><strong>嘴硬心软</strong>——嘴上嫌麻烦身体很诚实，吐槽朋友但最终都会配合，有重庆人的爽快劲儿</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-note">
+          <strong>ℹ️ 数据越多越像</strong><br>
+          目前基于 21 条分析。继续添加更多聊天记录、语音，数字分身会越来越像本人。
+        </div>
+
+        <button class="import-btn" style="margin-top:16px;">和数字版小王聊聊天 →</button>
+      </div>
+    </div>
+    <div class="iphone-bottombar"><div class="bar"></div></div>
+  </div>
+
+  <div class="annotation" style="margin-top:20px;">
+    <div class="label">💡 设计要点</div>
+    <p>这是"啊哈时刻"——用户看到AI分析出的风格画像时，应该产生"它居然看出来了"的惊喜。口头禅、聊天节奏、性格标签——这些是只从聊天记录中就能提取出来的浅层特征，但足够让用户感到"像"。底部的"数据越多越像"暗示了升级路径，但不强制。</p>
+  </div>
+</div>
+
+<!-- CONNECTOR -->
+<div class="flow-connector">
+  <div class="line"></div>
+  <span class="arrow">↓</span>
+  <div class="line"></div>
+</div>
+
+<!-- ===== STEP 4: CHAT ===== -->
+<div class="flow-section">
+  <div class="flow-step-label">STEP 4</div>
+  <h2 class="flow-title">和"数字版TA"聊天</h2>
+  <p class="flow-desc">文字对话先行，立刻体验效果</p>
+
+  <div class="iphone-frame">
+    <div class="iphone-statusbar">
+      <span class="time">15:32</span>
+      <span>96%</span>
+    </div>
+    <div class="iphone-content" style="display:flex;flex-direction:column;">
+      <div class="chat-screen">
+        <div class="chat-topbar">
+          <span class="back">‹</span>
+          <div class="chat-topbar-info">
+            <div class="chat-topbar-name">小王（数字版）</div>
+            <div class="chat-topbar-status">● 在线 · 基于21条对话学习</div>
+          </div>
+          <span class="chat-topbar-menu">···</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-time-divider">—— 今天 15:32 ——</div>
+
+          <div class="chat-bubble them">嗯？</div>
+
+          <div class="chat-bubble me">周末要不要去看电影</div>
+
+          <div class="chat-bubble them">看啥子嘛</div>
+
+          <div class="chat-bubble me">那个新出的科幻片</div>
+
+          <div class="chat-bubble them">行嘛</div>
+
+          <div class="chat-bubble me">你每次都这样，也不说想看还是不想看</div>
+
+          <div class="chat-bubble them">滚</div>
+
+          <div class="chat-bubble me">你看，又来了😂</div>
+
+          <div class="chat-bubble them">看得出来你想看，那就去呗，我跟着就是了</div>
+
+          <div class="chat-bubble me">哈哈你嘴上说不看身体很诚实</div>
+
+          <div class="chat-bubble them">再说是你自己说的好不</div>
+        </div>
+
+        <div class="chat-input-bar">
+          <input class="chat-input" placeholder="发给数字版小王..." />
+          <button class="chat-send">↑</button>
+        </div>
+      </div>
+    </div>
+    <div class="iphone-bottombar" style="display:none;"><div class="bar"></div></div>
+  </div>
+
+  <div class="annotation" style="margin-top:20px;">
+    <div class="label">💡 设计要点</div>
+    <p>对话界面模仿真实聊天App。关键在AI回复的风格——要像"小王"：短句、西南方言词（"啥子""嘛""行嘛"）、不主动表达意愿（"行嘛"而不是"好啊"）、被调侃就一个"滚"。用户看到这种回复会笑出来的——"太像了"。</p>
+  </div>
+</div>
+
+<!-- CONNECTOR -->
+<div class="flow-connector">
+  <div class="line"></div>
+  <span class="arrow">↓</span>
+  <div class="line"></div>
+</div>
+
+<!-- ===== STEP 5: VOICE ===== -->
+<div class="flow-section" style="padding-bottom:80px;">
+  <div class="flow-step-label">STEP 5</div>
+  <h2 class="flow-title">上传语音，解锁声音</h2>
+  <p class="flow-desc">可选升级：从文字克隆到声音克隆</p>
+
+  <div class="iphone-frame">
+    <div class="iphone-statusbar">
+      <span class="time">15:35</span>
+      <span>94%</span>
+    </div>
+    <div class="iphone-content">
+      <div class="voice-screen">
+        <div class="voice-header">
+          <h3>解锁小王的声音</h3>
+          <p>上传TA的语音，AI 学习后可以用TA的声音说话</p>
+        </div>
+
+        <div class="voice-upload-area">
+          <div class="voice-upload-icon">🎙️</div>
+          <div class="voice-upload-text">点击上传语音文件</div>
+          <div class="voice-upload-hint">支持 mp3 / m4a / wav · 10秒以上即可</div>
+        </div>
+
+        <div class="voice-comparison">
+          <h4>🔊 声音克隆对比</h4>
+          <div class="voice-player">
+            <div class="play-btn">▶</div>
+            <div class="info">
+              <div class="label">原始录音</div>
+              <div class="duration">小王 · 15秒</div>
+            </div>
+            <div class="wave">
+              <span style="height:8px"></span>
+              <span style="height:16px"></span>
+              <span style="height:12px"></span>
+              <span style="height:20px"></span>
+              <span style="height:10px"></span>
+              <span style="height:18px"></span>
+              <span style="height:6px"></span>
+              <span style="height:14px"></span>
+            </div>
+          </div>
+          <div class="voice-player">
+            <div class="play-btn" style="background:var(--green);">▶</div>
+            <div class="info">
+              <div class="label">AI 克隆声音</div>
+              <div class="duration">数字版小王 · 12秒</div>
+            </div>
+            <div class="wave">
+              <span style="height:10px"></span>
+              <span style="height:18px"></span>
+              <span style="height:8px"></span>
+              <span style="height:14px"></span>
+              <span style="height:20px"></span>
+              <span style="height:6px"></span>
+              <span style="height:16px"></span>
+              <span style="height:12px"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="voice-note">
+          ✓ 声音克隆基于开源模型（CosyVoice / GPT-SoVITS），5秒参考音频即可启动。语音对话模式已解锁，你可以直接和"有声音的小王"通话。
+        </div>
+      </div>
+    </div>
+    <div class="iphone-bottombar"><div class="bar"></div></div>
+  </div>
+
+  <div class="annotation" style="margin-top:20px;">
+    <div class="label">💡 设计要点</div>
+    <p>声音克隆是可选升级，不是必经步骤。用户可能上传自己保存的语音备忘录、聊天语音、甚至录屏。对比播放让用户直观感受克隆效果。"10秒即可"强调低门槛。</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:40px 20px 60px;color:var(--text-dim);font-size:0.8rem;">
+  <p>
+    AI人生银行 · 交互原型 v2<br>
+    从聊天记录到数字分身 · 5步完成<br>
+    数据来源均为模拟 · 仅用于产品概念讨论
+  </p>
+</div>
+
+<script>
+function toggleRole(el) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+
+</body>
+</html>
