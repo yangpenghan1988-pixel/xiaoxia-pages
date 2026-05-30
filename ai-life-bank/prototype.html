@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>AI人生银行 — 交互原型</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap');
+:root{--primary:#1a1a2e;--accent:#e94560;--accent-soft:rgba(233,69,96,.12);--gold:#f5a623;--gold-soft:rgba(245,166,35,.1);--green:#27ae60;--green-soft:rgba(39,174,96,.1);--blue:#60a5fa;--blue-soft:rgba(96,165,250,.1);--purple:#a78bfa;--purple-soft:rgba(167,139,250,.1);--teal:#2dd4bf;--bg:#f5f5f7;--card:#fff;--text:#1d1d1f;--text-dim:#86868b;--border:#e5e5ea;--shadow:0 1px 8px rgba(0,0,0,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* App Shell */
+#app{width:100%;max-width:430px;height:100vh;margin:0 auto;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+
+/* Status bar */
+.statusbar{height:48px;padding:12px 20px 0;display:flex;justify-content:space-between;font-size:.72rem;font-weight:600;color:#000;flex-shrink:0;background:var(--card);z-index:20;position:relative}
+.statusbar.dark{color:#fff;background:transparent}
+
+/* Page container */
+.pages{flex:1;position:relative;overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);transition:opacity .25s,transform .25s;opacity:0;transform:translateX(20px);pointer-events:none}
+.page.active{opacity:1;transform:none;pointer-events:auto}
+.page.slide-left{transform:translateX(-20px)}
+
+/* Tab bar */
+.tabbar{height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;flex-shrink:0;z-index:20;position:relative}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.68rem;color:var(--text-dim);cursor:pointer;transition:color .2s;position:relative}
+.tab.on{color:var(--accent)}
+.tab.on::before{content:'';position:absolute;top:-1px;left:20%;right:20%;height:2px;background:var(--accent);border-radius:0 0 2px 2px}
+.tab .tab-icon{font-size:1.2rem}
+.tab .tab-text{font-size:.65rem;font-weight:600}
+
+/* Shared components */
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:active{opacity:.8}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.badge-accent{background:var(--accent-soft);color:var(--accent)}
+.badge-green{background:var(--green-soft);color:var(--green)}
+
+/* ===== ONBOARDING ===== */
+.onboarding{background:linear-gradient(160deg,#0f0c29,var(--primary),var(--primary-light));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;min-height:100%}
+.ob-logo{font-size:3.5rem;margin-bottom:12px}
+.ob h2{font-size:1.6rem;font-weight:900;margin-bottom:6px}
+.ob .accent{color:var(--accent)}
+.ob p{font-size:.95rem;color:rgba(255,255,255,.5);line-height:1.8;max-width:320px;margin-bottom:32px}
+.ob-features{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin-bottom:32px}
+.ob-feat{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,.06);border-radius:12px;border:1px solid rgba(255,255,255,.08);text-align:left}
+.ob-feat .ic{font-size:1.3rem}
+.ob-feat .t{font-size:.88rem;color:rgba(255,255,255,.7)}
+.ob-dots{display:flex;gap:8px;margin-top:24px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2)}
+.ob-dot.on{background:var(--accent);width:24px;border-radius:4px}
+
+/* ===== HOME PAGE ===== */
+.home-header{padding:20px 20px 0}
+.home-greeting{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.home-greeting .name{font-size:1.2rem;font-weight:800}
+.home-greeting .streak{font-size:.72rem;padding:2px 8px;border-radius:10px;background:var(--gold-soft);color:var(--gold);font-weight:600}
+.home-prompt{font-size:.85rem;color:var(--text-dim);margin-bottom:16px}
+
+/* Quick actions */
+.quick-actions{display:flex;gap:10px;padding:0 20px 16px}
+.quick-action{flex:1;padding:16px 12px;background:var(--card);border-radius:14px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+.quick-action:active{transform:scale(.97)}
+.quick-action .ic{font-size:1.8rem;margin-bottom:4px}
+.quick-action .t{font-size:.75rem;font-weight:600;color:var(--text-dim)}
+
+/* Record area */
+.record-section{padding:0 20px;margin-bottom:16px}
+.record-btn{width:100%;padding:28px;background:var(--card);border-radius:16px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+.record-btn:active{transform:scale(.98)}
+.record-btn .circle{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff6b6b);display:inline-flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 6px 24px rgba(233,69,96,.25);margin-bottom:8px;transition:transform .2s}
+.record-btn:active .circle{transform:scale(.92)}
+.record-btn .hint{font-size:.82rem;color:var(--text-dim)}
+
+/* Import card */
+.import-card{margin:0 20px 16px;padding:20px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);cursor:pointer}
+.import-card .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.import-card .header .title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:6px}
+.import-card .header .arrow{color:var(--text-dim);font-size:.9rem}
+.import-card .desc{font-size:.8rem;color:var(--text-dim);line-height:1.6;margin-bottom:12px}
+.import-preview{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.75rem;color:var(--text-dim);line-height:1.6;max-height:80px;overflow:hidden;position:relative}
+.import-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(transparent,var(--bg))}
+
+/* Memory list */
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}
+.section-head .title{font-size:.95rem;font-weight:700}
+.section-head .more{font-size:.8rem;color:var(--accent);cursor:pointer}
+
+.mem-card{display:flex;gap:14px;padding:14px 20px;cursor:pointer}
+.mem-card:active{background:var(--bg)}
+.mem-date{min-width:42px;text-align:center;flex-shrink:0}
+.mem-day{font-size:1.2rem;font-weight:800;color:var(--primary)}
+.mem-month{font-size:.68rem;color:var(--text-dim)}
+.mem-body{flex:1;min-width:0}
+.mem-summary{font-size:.88rem;font-weight:600;line-height:1.5}
+.mem-preview{font-size:.78rem;color:var(--text-dim);line-height:1.5;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem-meta{display:flex;align-items:center;gap:10px;margin-top:4px;font-size:.72rem;color:var(--text-dim)}
+.mem-heart{cursor:pointer}
+.mem-heart.liked{color:var(--accent)}
+
+/* ===== IMPORT PAGE ===== */
+.page-top{display:flex;align-items:center;gap:10px;padding:16px 20px 8px}
+.page-top .back{font-size:1.2rem;color:var(--accent);cursor:pointer;width:24px}
+.page-top h3{font-size:1.05rem;font-weight:700;flex:1}
+
+.import-tabs{display:flex;margin:8px 20px 12px;background:#eee;border-radius:10px;padding:3px}
+.import-tab{flex:1;text-align:center;padding:7px;font-size:.8rem;font-weight:600;border-radius:8px;color:var(--text-dim);cursor:pointer}
+.import-tab.on{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+
+.import-ta{width:calc(100% - 40px);height:200px;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:.82rem;font-family:inherit;line-height:1.8;resize:none;color:var(--text);background:var(--card);margin:0 20px}
+.import-ta:focus{outline:none;border-color:var(--accent)}
+.import-ta::placeholder{color:#bbb}
+.import-hint{text-align:center;font-size:.72rem;color:var(--text-dim);padding:6px 20px}
+.import-actions{padding:12px 20px 20px;display:flex;gap:10px}
+.import-actions .btn{flex:1}
+
+/* Detect roles */
+.detect-box{margin:12px 20px;padding:20px;background:var(--card);border-radius:14px;box-shadow:var(--shadow)}
+.detect-box h4{font-size:.92rem;font-weight:700;margin-bottom:12px}
+.role-item{display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.role-item.sel{border-color:var(--accent);background:var(--accent-soft)}
+.role-item .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--bg);flex-shrink:0}
+.role-item.sel .av{background:var(--accent-soft)}
+.role-item .info{flex:1}
+.role-item .nm{font-size:.88rem;font-weight:700}
+.role-item .meta{font-size:.72rem;color:var(--text-dim)}
+.role-item .chk{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:transparent}
+.role-item.sel .chk{border-color:var(--accent);background:var(--accent);color:#fff}
+
+/* Profile */
+.profile-box{padding:24px 20px;text-align:center}
+.profile-av{width:72px;height:72px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,var(--accent),#ff6b6b);box-shadow:0 4px 16px rgba(233,69,96,.2)}
+.profile-box h3{font-size:1.1rem;font-weight:800}
+.profile-box .psub{font-size:.8rem;color:var(--text-dim);margin-top:2px}
+.profile-acc{margin-top:6px}
+
+.feat-list{padding:0 20px 20px}
+.feat-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.feat-row:last-child{border:none}
+.feat-ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.feat-body .fl{font-size:.8rem;font-weight:700}
+.feat-body .fv{font-size:.78rem;color:var(--text-dim);line-height:1.6;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
+.tag{font-size:.68rem;padding:2px 8px;border-radius:12px;background:var(--bg);color:var(--text-dim)}
+.note-box{margin:0 20px 16px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:.75rem;color:var(--text-dim);line-height:1.7}
+.note-box strong{color:var(--text)}
+
+/* ===== CHAT PAGE ===== */
+.chat-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--card);flex-shrink:0}
+.chat-header .back{font-size:1.1rem;color:var(--accent);cursor:pointer}
+.chat-header .info{flex:1}
+.chat-header .nm{font-size:.92rem;font-weight:700}
+.chat-header .st{font-size:.7rem;color:var(--green)}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.chat-time{text-align:center;font-size:.66rem;color:var(--text-dim);padding:6px 0}
+.bbl{max-width:78%;padding:9px 13px;border-radius:16px;font-size:.84rem;line-height:1.6;animation:bin .25s ease}
+@keyframes bin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bbl.them{align-self:flex-start;background:var(--card);border-bottom-left-radius:5px}
+.bbl.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.bbl.typing{display:flex;gap:4px;padding:12px 16px;align-self:flex-start;background:var(--card);border-bottom-left-radius:5px}
+.bbl.typing .dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:td 1.4s infinite}
+.bbl.typing .dot:nth-child(2){animation-delay:.2s}
+.bbl.typing .dot:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,60%,100%{opacity:.3}30%{opacity:1;transform:translateY(-3px)}}
+.chat-input{padding:8px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--card);flex-shrink:0}
+.chat-input input{flex:1;padding:10px 14px;border:none;border-radius:20px;background:var(--bg);font-size:.84rem;font-family:inherit}
+.chat-input input:focus{outline:none}
+.chat-input input::placeholder{color:#bbb}
+.chat-send{width:34px;height:34px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-send:active{opacity:.7}
+
+/* ===== TIMELINE PAGE ===== */
+.stats-bar{display:flex;padding:16px 20px;gap:0;background:var(--card);border-bottom:1px solid var(--border)}
+.stat-item{flex:1;text-align:center}
+.stat-item .num{font-size:1.4rem;font-weight:800;color:var(--primary)}
+.stat-item .lbl{font-size:.68rem;color:var(--text-dim)}
+.stat-divider{width:1px;background:var(--border);margin:8px 0}
+
+.month-chips{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.month-chips::-webkit-scrollbar{display:none}
+.mchip{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600;background:var(--card);color:var(--text-dim);cursor:pointer;transition:all .2s;border:1px solid var(--border)}
+.mchip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.tl-group{padding:0 20px}
+.tl-date{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:.82rem;font-weight:600;color:var(--text-dim)}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.tl-card{margin-left:14px;padding-left:16px;border-left:2px solid var(--border);margin-bottom:12px}
+.tl-card:last-child{border-left-color:transparent}
+.tl-card-content{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.tl-card-content .time{font-size:.7rem;color:var(--text-dim);margin-bottom:4px;display:flex;justify-content:space-between}
+.tl-card-content .summary{font-size:.88rem;font-weight:600;margin-bottom:4px}
+.tl-card-content .text{font-size:.8rem;color:var(--text-dim);line-height:1.6}
+.tl-card-content .heart{margin-top:8px;font-size:.78rem;cursor:pointer;display:inline-block}
+
+/* ===== FAMILY PAGE ===== */
+.family-card{margin:12px 20px;padding:20px;background:var(--card);border-radius:16px;box-shadow:var(--shadow)}
+.family-card .fname{font-size:1.05rem;font-weight:700}
+.family-card .fsub{font-size:.8rem;color:var(--text-dim);margin-top:2px}
+.family-members{display:flex;gap:12px;margin-top:14px;overflow-x:auto;padding-bottom:4px}
+.family-members::-webkit-scrollbar{display:none}
+.fmember{flex-shrink:0;text-align:center;width:60px}
+.fmember .av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:var(--bg);margin:0 auto 4px}
+.fmember.add .av{background:var(--accent-soft);font-size:1.2rem;color:var(--accent);display:flex;align-items:center;justify-content:center;border-radius:50%;width:48px;height:48px}
+.fmember .n{font-size:.7rem;color:var(--text-dim)}
+
+.activity-item{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
+.activity-item .av{font-size:1.3rem;flex-shrink:0;width:36px;text-align:center}
+.activity-item .body{flex:1;min-width:0}
+.activity-item .text{font-size:.85rem}
+.activity-item .text .nm{font-weight:700}
+.activity-item .quote{font-size:.8rem;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.activity-item .time{font-size:.7rem;color:var(--text-dim);margin-top:2px}
+
+.imp-card{display:flex;gap:12px;padding:14px 20px;align-items:flex-start}
+.imp-card .ic{font-size:1.2rem;flex-shrink:0}
+.imp-card .body{flex:1}
+.imp-card .text{font-size:.88rem;font-weight:600}
+.imp-card .meta{font-size:.72rem;color:var(--text-dim);margin-top:2px}
+
+/* ===== AI INTERVIEW PAGE ===== */
+.interview-msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.interview-msg{max-width:85%;padding:14px 16px;border-radius:16px;font-size:.88rem;line-height:1.7}
+.interview-msg.ai{align-self:flex-start;background:var(--card);border-bottom-left-radius:5px;box-shadow:var(--shadow)}
+.interview-msg.ai .role{font-size:.7rem;color:var(--accent);font-weight:600;margin-bottom:4px}
+.interview-msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.interview-msg.ai .options{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.interview-msg.ai .opt{padding:8px 12px;background:var(--bg);border-radius:8px;font-size:.82rem;cursor:pointer;border:1px solid var(--border);transition:all .2s}
+.interview-msg.ai .opt:active{border-color:var(--accent);background:var(--accent-soft)}
+.interview-progress{padding:8px 20px;display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--text-dim);background:var(--card);border-top:1px solid var(--border);flex-shrink:0}
+.interview-progress .bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.interview-progress .bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+
+/* ===== VOICE CLONE PAGE ===== */
+.voice-content{padding:0 20px 20px;overflow-y:auto;flex:1}
+.voice-hero{text-align:center;padding:20px 0}
+.voice-hero h3{font-size:1.05rem;font-weight:800;margin-bottom:4px}
+.voice-hero p{font-size:.82rem;color:var(--text-dim)}
+.voice-upload{border:2px dashed var(--border);border-radius:16px;padding:32px 16px;text-align:center;cursor:pointer;margin-bottom:16px;transition:all .2s}
+.voice-upload:active{border-color:var(--accent);background:var(--accent-soft)}
+.voice-upload .ic{font-size:2.5rem;margin-bottom:6px}
+.voice-upload .t{font-size:.88rem;font-weight:600;margin-bottom:3px}
+.voice-upload .h{font-size:.72rem;color:var(--text-dim)}
+.voice-player{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--card);border-radius:12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.voice-play{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;flex-shrink:0;cursor:pointer}
+.vp-orig{background:var(--accent)}
+.vp-clone{background:var(--green)}
+.vp-info{flex:1}
+.vp-info .l{font-size:.8rem;font-weight:600}
+.vp-info .d{font-size:.68rem;color:var(--text-dim)}
+.vp-wave{display:flex;align-items:center;gap:2px;width:48px}
+.vp-wave span{width:2px;background:var(--border);border-radius:1px}
+.voice-note{background:var(--green-soft);border-radius:10px;padding:12px;font-size:.75rem;color:var(--green);line-height:1.7;margin-top:12px}
+
+/* Result modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:24px 20px 32px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal .badge-top{display:inline-block;font-size:.72rem;padding:3px 10px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-weight:600;margin-bottom:12px}
+.modal .result-text{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.modal .result-original{background:var(--bg);border-radius:10px;padding:12px;font-size:.82rem;color:var(--text-dim);line-height:1.7;margin-bottom:16px}
+.modal .result-label{font-size:.72rem;color:var(--text-dim);margin-bottom:4px}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.modal-actions .btn{flex:1;padding:12px}
+
+/* Top banner for import result */
+.banner{margin:12px 20px;padding:14px 16px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:14px;color:#fff;cursor:pointer}
+.banner .title{font-size:.92rem;font-weight:700;display:flex;align-items:center;gap:6px}
+.banner .desc{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===== ONBOARDING ===== -->
+<div class="page active" id="page-onboarding">
+  <div class="statusbar dark"><span>15:30</span><span>100%</span></div>
+  <div class="onboarding">
+    <div class="ob-logo">🏦</div>
+    <h2>AI 人生银行</h2>
+    <div class="ob accent" style="font-size:1.1rem;margin-bottom:16px;">给你爱的人留一份会说话的记忆</div>
+    <p>每天只用30秒，用声音记录生活。AI帮你整理成珍贵的人生时间线，家人随时可以回听。</p>
+    <div class="ob-features">
+      <div class="ob-feat"><span class="ic">🎤</span><span class="t">按住说话，30秒即可</span></div>
+      <div class="ob-feat"><span class="ic">💬</span><span class="t">粘贴聊天记录，AI学会TA的风格</span></div>
+      <div class="ob-feat"><span class="ic">👨‍👩‍👦</span><span class="t">家人共享，代际传承</span></div>
+    </div>
+    <button class="btn btn-accent" onclick="goTo('home')" style="max-width:320px;">开始记录</button>
+    <div class="ob-dots"><div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+  </div>
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="page" id="page-home">
+  <div class="statusbar"><span>15:30</span><span>100%</span></div>
+  <div style="flex:1;overflow-y:auto;padding-bottom:16px;">
+    <div class="home-header">
+      <div class="home-greeting">
+        <span class="name">下午好 👋</span>
+        <span class="badge badge-accent">🔥 连续 3 天</span>
+      </div>
+      <div class="home-prompt">今天过得怎么样？</div>
+    </div>
+
+    <div class="quick-actions">
+      <div class="quick-action" onclick="goTo('import')"><div class="ic">💬</div><div class="t">导入聊天</div></div>
+      <div class="quick-action" onclick="startRecord()"><div class="ic">🎤</div><div class="t">录音</div></div>
+      <div class="quick-action" onclick="goTo('interview')"><div class="ic">🤖</div><div class="t">AI采访</div></div>
+      <div class="quick-action" onclick="goTo('voice')"><div class="ic">🎙️</div><div class="t">声音克隆</div></div>
+    </div>
+
+    <div class="import-card" onclick="goTo('chat-dl')">
+      <div class="header">
+        <div class="title">👦 数字版小王</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="desc">基于21条聊天记录学习 · 风格匹配度87%</div>
+      <div class="import-preview">小王：滚<br>小王：行嘛<br>小王：吃啥子嘛<br>小王：莫提了，加班加到头秃<br>小王：说的轻巧，现在大环境这么差</div>
+    </div>
+
+    <div class="record-section">
+      <div class="record-btn" onclick="startRecord()">
+        <div class="circle">🎤</div>
+        <div class="hint">按住说话（最长60秒）</div>
+      </div>
+    </div>
+
+    <div class="section-head"><div class="title">最近记忆</div><div class="more" onclick="switchTab(1)">全部 →</div></div>
+
+    <div class="mem-card">
+      <div class="mem-date"><div class="mem-day">30</div><div class="mem-month">5月</div></div>
+      <div class="mem-body"><div class="mem-summary">带儿子去了公园，看到了樱花 ❤️</div><div class="mem-preview">今天天气特别好，带儿子去了朝阳公园...</div><div class="mem-meta"><span>🎵 28秒</span><span>今天 09:15</span><span class="mem-heart liked" onclick="this.classList.toggle('liked')">❤️</span></div></div>
+    </div>
+    <div class="mem-card">
+      <div class="mem-date"><div class="mem-day">29</div><div class="mem-month">5月</div></div>
+      <div class="mem-body"><div class="mem-summary">想起小时候在重庆的生活</div><div class="mem-preview">突然想起小时候在重庆，夏天的时候外婆家后面那条河...</div><div class="mem-meta"><span>🎵 22秒</span><span>昨天 20:30</span><span class="mem-heart" onclick="this.classList.toggle('liked')">🤍</span></div></div>
+    </div>
+    <div class="mem-card">
+      <div class="mem-date"><div class="mem-day">28</div><div class="mem-month">5月</div></div>
+      <div class="mem-body"><div class="mem-summary">和老婆结婚二十周年感慨 ❤️</div><div class="mem-preview">今天是我和老婆结婚二十周年...</div><div class="mem-meta"><span>🎵 35秒</span><span>前天 07:45</span><span class="mem-heart liked" onclick="this.classList.toggle('liked')">❤️</span></div></div>
+    </div>
+    <div class="mem-card">
+      <div class="mem-date"><div class="mem-day">27</div><div class="mem-month">5月</div></div>
+      <div class="mem-body"><div class="mem-summary">关于工作的一些思考</div><div class="mem-preview">最近公司在做一些调整，我在想是不是该往AI方向转一下...</div><div class="mem-meta"><span>🎵 30秒</span><span>4天前</span><span class="mem-heart" onclick="this.classList.toggle('liked')">🤍</span></div></div>
+    </div>
+    <div class="mem-card">
+      <div class="mem-date"><div class="mem-day">25</div><div class="mem-month">5月</div></div>
+      <div class="mem-body"><div class="mem-summary">教儿子骑自行车的回忆 ❤️</div><div class="mem-preview">今天教儿子骑自行车，他摔了两次但是没哭...</div><div class="mem-meta"><span>🎵 32秒</span><span>5天前</span><span class="mem-heart" onclick="this.classList.toggle('liked')">🤍</span></div></div>
+    </div>
+    <div class="mem-card">
+      <div class="mem-date"><div class="mem-day">23</div><div class="mem-month">5月</div></div>
+      <div class="mem-body"><div class="mem-summary">下雨天想起了外婆的红糖糍粑 ❤️</div><div class="mem-preview">今天下雨，坐在窗边听雨声...</div><div class="mem-meta"><span>🎵 24秒</span><span>上周</span><span class="mem-heart liked" onclick="this.classList.toggle('liked')">❤️</span></div></div>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tabbar">
+    <div class="tab on" onclick="switchTab(0)"><div class="tab-icon">🎤</div><div class="tab-text">记录</div></div>
+    <div class="tab" onclick="switchTab(1)"><div class="tab-icon">📅</div><div class="tab-text">时间线</div></div>
+    <div class="tab" onclick="switchTab(2)"><div class="tab-icon">👨‍👩‍👦</div><div class="tab-text">家庭</div></div>
+  </div>
+</div>
+
+<!-- ===== IMPORT ===== -->
+<div class="page" id="page-import">
+  <div class="statusbar"><span>15:30</span><span>100%</span></div>
+  <div style="flex:1;overflow-y:auto;">
+    <div class="page-top"><div class="back" onclick="goTo('home')">‹</div><h3>导入聊天记录</h3></div>
+    <div class="import-tabs"><div class="import-tab on">粘贴文本</div><div class="import-tab">上传文件</div></div>
+    <textarea class="import-ta" placeholder="粘贴你和TA的聊天记录……" id="chatInput">大刘：周末出来吃饭不
+小王：吃啥子嘛
+大刘：火锅噻，你不是一直想吃那个新开的
+小王：行嘛，几点
+大刘：6点？老地方
+小王：要得
+大刘：对了你带一下老陈
+小王：他又不是不认识路
+大刘：他开车来的嘛，顺便带一下你
+小王：好吧好吧
+大刘：哈哈你这人就是嘴上凶
+小王：滚
+大刘：😂😂😂
+小王：记得到时候给我留个清汤锅
+大刘：晓得晓得
+小王：上次你点的全是辣的，辣得我第二天拉肚子
+大刘：那是你没吃 Tulasi
+小王：啥子东西
+大刘：解辣的酸奶啊，印度那个
+小王：算了算了
+大刘：你最近工作咋样
+小王：莫提了，加班加到头秃
+大刘：又加班？你们老板真是的
+小王：还不是为了那点工资嘛
+大刘：要不要考虑换个工作嘛
+小王：说的轻巧，现在大环境这么差</textarea>
+    <div class="import-hint">微信、QQ、短信……任何对话文本都可以</div>
+    <div class="import-actions"><button class="btn btn-outline" onclick="goTo('home')">取消</button><button class="btn btn-accent" onclick="startAnalysis()">开始分析 →</button></div>
+    <div id="detectResult"></div>
+  </div>
+</div>
+
+<!-- ===== PROFILE ===== -->
+<div class="page" id="page-profile">
+  <div class="statusbar"><span>15:31</span><span>98%</span></div>
+  <div style="flex:1;overflow-y:auto;">
+    <div class="page-top"><div class="back" onclick="goTo('import')">‹</div><h3>说话风格画像</h3></div>
+    <div class="profile-box">
+      <div class="profile-av">👦</div>
+      <h3>小王 的数字分身</h3>
+      <div class="psub">基于 21 条对话分析</div>
+      <div class="badge badge-green profile-acc">✓ 风格匹配度 87%</div>
+    </div>
+    <div class="feat-list">
+      <div class="feat-row"><div class="feat-ic" style="background:var(--accent-soft)">🗣️</div><div class="feat-body"><div class="fl">常用口头禅</div><div class="fv">"啥子" "嘛" "莫" "晓得" "要得"</div></div></div>
+      <div class="feat-row"><div class="feat-ic" style="background:var(--blue-soft)">✍️</div><div class="feat-body"><div class="fl">说话风格</div><div class="tags"><span class="tag">短句为主</span><span class="tag">直来直去</span><span class="tag">不爱铺垫</span><span class="tag">偶尔毒舌</span></div></div></div>
+      <div class="feat-row"><div class="feat-ic" style="background:var(--gold-soft)">😀</div><div class="feat-body"><div class="fl">表情习惯</div><div class="fv">极少使用表情，"滚"代替90%的情绪表达</div></div></div>
+      <div class="feat-row"><div class="feat-ic" style="background:var(--green-soft)">⏱️</div><div class="feat-body"><div class="fl">聊天节奏</div><div class="fv">回应快但不主动发起，被问才答，答完等下一个</div></div></div>
+      <div class="feat-row"><div class="feat-ic" style="background:var(--purple-soft)">🧩</div><div class="feat-body"><div class="fl">性格画像</div><div class="fv"><strong>嘴硬心软</strong>——嘴上嫌麻烦身体很诚实，吐槽朋友但最终都会配合</div></div></div>
+    </div>
+    <div class="note-box"><strong>ℹ️ 数据越多越像</strong><br>目前基于21条。继续添加聊天记录、上传语音，数字分身会越来越像本人。</div>
+    <div style="padding:0 20px 20px;display:flex;gap:10px"><button class="btn btn-outline" onclick="goTo('home')">返回</button><button class="btn btn-accent" onclick="goTo('chat-dl')">和TA聊天 →</button></div>
+  </div>
+</div>
+
+<!-- ===== CHAT WITH DIGITAL CLONE ===== -->
+<div class="page" id="page-chat-dl">
+  <div class="statusbar"><span>15:32</span><span>96%</span></div>
+  <div class="chat-header">
+    <div class="back" onclick="goTo('home')">‹</div>
+    <div class="info"><div class="nm">小王（数字版）</div><div class="st">● 在线 · 基于21条对话学习</div></div>
+    <span style="font-size:.72rem;color:var(--text-dim);">···</span>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="chat-time">—— 今天 15:32 ——</div>
+    <div class="bbl them">嗯？</div>
+    <div class="bbl me">周末要不要去看电影</div>
+    <div class="bbl them">看啥子嘛</div>
+    <div class="bbl me">那个新出的科幻片</div>
+    <div class="bbl them">行嘛</div>
+    <div class="bbl me">你每次都这样，也不说想看还是不想看</div>
+    <div class="bbl them">滚</div>
+    <div class="bbl me">你看，又来了😂</div>
+    <div class="bbl them">看得出来你想看，那就去呗，我跟着就是了</div>
+    <div class="bbl me">哈哈你嘴上说不看身体很诚实</div>
+    <div class="bbl them">再说是你自己说的好不</div>
+  </div>
+  <div class="chat-input">
+    <input placeholder="发给数字版小王..." id="chatInputField" onkeydown="if(event.key==='Enter')sendMsg()"/>
+    <button class="chat-send" onclick="sendMsg()">↑</button>
+  </div>
+</div>
+
+<!-- ===== TIMELINE ===== -->
+<div class="page" id="page-timeline">
+  <div class="statusbar"><span>15:30</span><span>100%</span></div>
+  <div style="flex:1;overflow-y:auto;">
+    <div class="stats-bar">
+      <div class="stat-item"><div class="num">12</div><div class="lbl">段记忆</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="num">4</div><div class="lbl">❤️ 重要</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="num">6</div><div class="lbl">分钟录音</div></div>
+    </div>
+    <div class="month-chips">
+      <div class="mchip on">全部</div>
+      <div class="mchip">2026-05</div>
+      <div class="mchip">2026-04</div>
+    </div>
+    <div class="tl-group">
+      <div class="tl-date"><div class="tl-dot"></div>今天 · 5月30日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>09:15</span><span>🎵 28秒</span></div><div class="summary">带儿子去了公园，看到了樱花 ❤️</div><div class="text">今天天气特别好，带儿子去了朝阳公园，樱花都开了，儿子特别开心，跑来跑去的。</div><div class="heart">❤️ 重要记忆</div></div></div>
+      <div class="tl-date"><div class="tl-dot"></div>昨天 · 5月29日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>20:30</span><span>🎵 22秒</span></div><div class="summary">想起小时候在重庆的生活</div><div class="text">突然想起小时候在重庆，夏天的时候外婆家后面那条河，我们一群小伙伴天天去游泳。</div></div></div>
+      <div class="tl-date"><div class="tl-dot"></div>前天 · 5月28日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>07:45</span><span>🎵 35秒</span></div><div class="summary">和老婆结婚二十周年感慨 ❤️</div><div class="text">今天是我和老婆结婚二十周年，她早上给我煮了一碗面，还是当年第一次约会时候的那种。</div><div class="heart">❤️ 重要记忆</div></div></div>
+      <div class="tl-date"><div class="tl-dot"></div>5月27日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>18:20</span><span>🎵 30秒</span></div><div class="summary">关于工作的一些思考</div><div class="text">最近公司在做一些调整，我在想是不是该往AI方向转一下。</div></div></div>
+      <div class="tl-date"><div class="tl-dot"></div>5月25日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>15:10</span><span>🎵 32秒</span></div><div class="summary">教儿子骑自行车的回忆 ❤️</div><div class="text">今天教儿子骑自行车，他摔了两次但是没哭，自己爬起来继续骑。像他这么大的时候，我也是这样学会的。</div><div class="heart">❤️ 重要记忆</div></div></div>
+      <div class="tl-date"><div class="tl-dot"></div>5月23日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>14:30</span><span>🎵 24秒</span></div><div class="summary">下雨天想起了外婆的红糖糍粑 ❤️</div><div class="text">今天下雨，坐在窗边听雨声。突然想起以前在重庆，下雨天外婆会做红糖糍粑给我们吃。</div><div class="heart">❤️ 重要记忆</div></div></div>
+      <div class="tl-date"><div class="tl-dot"></div>5月20日</div>
+      <div class="tl-card"><div class="tl-card-content"><div class="time"><span>21:00</span><span>🎵 38秒</span></div><div class="summary">第一次坐飞机的经历</div><div class="text">跟儿子讲了我第一次坐飞机的事。那年我18岁，从重庆飞北京上大学。</div></div></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <div class="tab" onclick="switchTab(0)"><div class="tab-icon">🎤</div><div class="tab-text">记录</div></div>
+    <div class="tab on" onclick="switchTab(1)"><div class="tab-icon">📅</div><div class="tab-text">时间线</div></div>
+    <div class="tab" onclick="switchTab(2)"><div class="tab-icon">👨‍👩‍👦</div><div class="tab-text">家庭</div></div>
+  </div>
+</div>
+
+<!-- ===== FAMILY ===== -->
+<div class="page" id="page-family">
+  <div class="statusbar"><span>15:30</span><span>100%</span></div>
+  <div style="flex:1;overflow-y:auto;">
+    <div class="family-card">
+      <div class="fname">👨‍👩‍👦 张家的记忆</div>
+      <div class="fsub">4 位成员 · 12 段记忆</div>
+      <div class="family-members">
+        <div class="fmember"><div class="av">👨</div><div class="n">Will</div></div>
+        <div class="fmember"><div class="av">👩</div><div class="n">妈妈</div></div>
+        <div class="fmember"><div class="av">👦</div><div class="n">儿子</div></div>
+        <div class="fmember"><div class="av">👴</div><div class="n">爸爸</div></div>
+        <div class="fmember add" onclick="event.stopPropagation()"><div class="av">＋</div><div class="n">邀请</div></div>
+      </div>
+    </div>
+    <div class="section-head"><div class="title">家庭动态</div></div>
+    <div class="activity-item"><div class="av">👨</div><div class="body"><div class="text"><span class="nm">Will</span> 录了一段新记忆</div><div class="quote">「带儿子去了公园，看到了樱花」</div><div class="time">2 分钟前</div></div></div>
+    <div class="activity-item"><div class="av">👩</div><div class="body"><div class="text"><span class="nm">妈妈</span> 加入了这个家庭</div><div class="time">昨天</div></div></div>
+    <div class="activity-item"><div class="av">👨</div><div class="body"><div class="text"><span class="nm">Will</span> 标记了一段重要记忆</div><div class="quote">「和老婆结婚二十周年感慨」</div><div class="time">3 天前</div></div></div>
+    <div class="activity-item"><div class="av">👨</div><div class="body"><div class="text"><span class="nm">Will</span> 录了一段新记忆</div><div class="quote">「想起小时候在重庆的生活」</div><div class="time">4 天前</div></div></div>
+    <div class="section-head"><div class="title">❤️ 重要记忆</div><div class="more">管理 →</div></div>
+    <div class="imp-card"><div class="ic">✨</div><div class="body"><div class="text">和老婆结婚二十周年感慨</div><div class="meta">Will · 3天前</div></div></div>
+    <div class="imp-card"><div class="ic">✨</div><div class="body"><div class="text">关于老家那棵黄桷树</div><div class="meta">Will · 上周</div></div></div>
+    <div class="imp-card"><div class="ic">✨</div><div class="body"><div class="text">下雨天想起了外婆的红糖糍粑</div><div class="meta">Will · 2周前</div></div></div>
+  </div>
+  <div class="tabbar">
+    <div class="tab" onclick="switchTab(0)"><div class="tab-icon">🎤</div><div class="tab-text">记录</div></div>
+    <div class="tab" onclick="switchTab(1)"><div class="tab-icon">📅</div><div class="tab-text">时间线</div></div>
+    <div class="tab on" onclick="switchTab(2)"><div class="tab-icon">👨‍👩‍👦</div><div class="tab-text">家庭</div></div>
+  </div>
+</div>
+
+<!-- ===== AI INTERVIEW ===== -->
+<div class="page" id="page-interview">
+  <div class="statusbar"><span>15:35</span><span>95%</span></div>
+  <div class="chat-header">
+    <div class="back" onclick="goTo('home')">‹</div>
+    <div class="info"><div class="nm">🤖 AI 采访员</div><div class="st">第 3 / 10 个问题</div></div>
+  </div>
+  <div class="interview-msgs">
+    <div class="interview-msg ai"><div class="role">AI 采访员</div>你好！我是你的AI采访员，接下来我会问你一些关于人生的问题，每个问题你用几句话回答就好。准备好了吗？</div>
+    <div class="interview-msg user">好了，开始吧</div>
+    <div class="interview-msg ai"><div class="role">AI 采访员</div>第一个问题：<br><br><strong>你小时候最深刻的记忆是什么？</strong><br><br>可以是任何场景——一个人、一件事、一个地方。</div>
+    <div class="interview-msg user">小时候在重庆，夏天的时候外婆家后面那条河，我们一群小伙伴天天去游泳，那时候真的无忧无虑啊。</div>
+    <div class="interview-msg ai"><div class="role">AI 采访员</div>这个画面好生动！游泳的时候最开心的是什么？</div>
+    <div class="interview-msg user">就是那种从高处跳下去的感觉，凉凉的水，特别爽。还有就是外婆会做好吃的等我们回来。</div>
+    <div class="interview-msg ai"><div class="role">AI 采访员</div>第三个问题：<br><br><strong>你人生中做过最勇敢的一个决定是什么？</strong><br><br>可以是一个转折点，也可以是一个不为人知的勇气时刻。
+      <div class="options">
+        <div class="opt" onclick="selectOption(this)">关于工作的选择</div>
+        <div class="opt" onclick="selectOption(this)">关于感情的勇气</div>
+        <div class="opt" onclick="selectOption(this)">一个意外的决定</div>
+      </div>
+    </div>
+  </div>
+  <div class="interview-progress">
+    <span>进度</span><div class="bar"><div class="fill" style="width:30%"></div></div><span>3/10</span>
+  </div>
+</div>
+
+<!-- ===== VOICE CLONE ===== -->
+<div class="page" id="page-voice">
+  <div class="statusbar"><span>15:40</span><span>93%</span></div>
+  <div class="page-top"><div class="back" onclick="goTo('home')">‹</div><h3>声音克隆</h3></div>
+  <div class="voice-content">
+    <div class="voice-hero"><h3>解锁小王的声音</h3><p>上传TA的语音，AI学习后可以用TA的声音说话</p></div>
+    <div class="voice-upload" onclick="event.stopPropagation()"><div class="ic">🎙️</div><div class="t">点击上传语音文件</div><div class="h">支持 mp3/m4a/wav · 10秒以上即可</div></div>
+    <h4 style="font-size:.88rem;font-weight:700;margin-bottom:10px;text-align:center;">🔊 声音克隆对比</h4>
+    <div class="voice-player"><div class="voice-play vp-orig">▶</div><div class="vp-info"><div class="l">原始录音</div><div class="d">小王 · 15秒</div></div><div class="vp-wave"><span style="height:8px"></span><span style="height:16px"></span><span style="height:10px"></span><span style="height:20px"></span><span style="height:8px"></span><span style="height:16px"></span><span style="height:6px"></span><span style="height:12px"></span></div></div>
+    <div class="voice-player"><div class="voice-play vp-clone">▶</div><div class="vp-info"><div class="l">AI 克隆声音</div><div class="d">数字版小王 · 12秒</div></div><div class="vp-wave"><span style="height:10px"></span><span style="height:18px"></span><span style="height:8px"></span><span style="height:14px"></span><span style="height:20px"></span><span style="height:6px"></span><span style="height:16px"></span><span style="height:10px"></span></div></div>
+    <div class="voice-note">✓ 声音克隆基于开源模型（CosyVoice / GPT-SoVITS），5秒参考音频即可启动。语音对话模式已解锁。</div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+let currentPage = 'page-onboarding';
+const responses = [
+  '看啥子嘛','行嘛','滚','说的轻巧','莫提了','要得','晓得晓得','算了算了','好吧好吧','啥子东西嘛'
+];
+
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
+  const target = document.getElementById('page-' + pageId);
+  if (target) {
+    target.classList.add('active');
+    target.scrollTop = 0;
+    currentPage = 'page-' + pageId;
+  }
+}
+
+function switchTab(idx) {
+  const pages = ['page-home','page-timeline','page-family'];
+  goTo(pages[idx].replace('page-',''));
+  document.querySelectorAll('.tabbar .tab').forEach((t,i) => t.classList.toggle('on', i===idx));
+}
+
+function startAnalysis() {
+  const input = document.getElementById('chatInput');
+  if (!input.value.trim()) return;
+  document.getElementById('detectResult').innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--text-dim);font-size:.88rem;">🔍 正在分析聊天记录…</div>';
+  setTimeout(() => {
+    document.getElementById('detectResult').innerHTML = `
+      <div class="detect-box">
+        <h4>🔍 分析完成，检测到 <strong>2 个角色</strong></h4>
+        <h4 style="margin-top:16px;">你想克隆谁？</h4>
+        <div class="role-item" onclick="this.classList.remove('sel');this.nextElementSibling.classList.add('sel')">
+          <div class="av">🧑</div><div class="info"><div class="nm">大刘</div><div class="meta">10条 · 主动发起 · 热情直爽型</div></div><div class="chk">✓</div>
+        </div>
+        <div class="role-item sel">
+          <div class="av">👦</div><div class="info"><div class="nm">小王</div><div class="meta">11条 · 回应为主 · 嘴硬心软型</div></div><div class="chk">✓</div>
+        </div>
+        <button class="btn btn-accent" style="margin-top:12px;" onclick="goTo('profile')">生成数字分身 →</button>
+      </div>`;
+  }, 1500);
+}
+
+function sendMsg() {
+  const input = document.getElementById('chatInputField');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const msgs = document.getElementById('chatMsgs');
+  msgs.innerHTML += `<div class="bbl me">${text}</div>`;
+  msgs.innerHTML += `<div class="bbl them typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const typing = msgs.querySelector('.typing');
+    const resp = responses[Math.floor(Math.random()*responses.length)];
+    typing.className = 'bbl them';
+    typing.textContent = resp;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1200 + Math.random()*800);
+}
+
+function selectOption(el) {
+  el.parentNode.querySelectorAll('.opt').forEach(o => { o.style.borderColor='var(--border)'; o.style.background='var(--bg)'; });
+  el.style.borderColor='var(--accent)';
+  el.style.background='var(--accent-soft)';
+  setTimeout(() => goTo('home'), 500);
+}
+
+function startRecord() {
+  // Just show a toast-like effect
+  const btn = document.querySelector('.record-btn');
+  if (!btn) return;
+  const circle = btn.querySelector('.circle');
+  const hint = btn.querySelector('.hint');
+  circle.textContent = '⏹';
+  circle.style.background = '#333';
+  hint.textContent = '录音中… 0秒';
+  hint.style.color = 'var(--accent)';
+  let sec = 0;
+  const timer = setInterval(() => {
+    sec++;
+    hint.textContent = '录音中… ' + sec + '秒';
+    if (sec >= 5) {
+      clearInterval(timer);
+      circle.textContent = '🎤';
+      circle.style.background = '';
+      hint.textContent = '按住说话（最长60秒）';
+      hint.style.color = '';
+      // Show result modal
+      showResult();
+    }
+  }, 1000);
+}
+
+function showResult() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="badge-top">✨ AI 整理完成</div>
+      <div class="result-text">今天阳光特别好，带儿子去了朝阳公园</div>
+      <div class="result-label">原始录音文字</div>
+      <div class="result-original">今天天气特别好，带儿子去了朝阳公园，樱花都开了，儿子特别开心，跑来跑去的。我说你要不要拍个照给妈妈看，他说好。</div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+        <button class="btn btn-accent" onclick="this.closest('.modal-overlay').remove()">分享给家人</button>
+      </div>
+    </div>`;
+  document.getElementById('app').appendChild(overlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+}
+
+// Mchip toggle
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('mchip')) {
+    e.target.parentElement.querySelectorAll('.mchip').forEach(c => c.classList.remove('on'));
+    e.target.classList.add('on');
+  }
+});
+</script>
+
+</body>
+</html>
